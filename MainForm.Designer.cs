@@ -29,6 +29,7 @@
     private void InitializeComponent()
     {
       components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       ChartPictureBox = new PictureBox();
       ClockInOutButton = new Button();
       TopPanel = new Panel();
@@ -280,6 +281,7 @@
       Controls.Add(TopPanel);
       Controls.Add(BottomPanel);
       FormBorderStyle = FormBorderStyle.FixedSingle;
+      Icon = (Icon)resources.GetObject("$this.Icon");
       MaximizeBox = false;
       Name = "MainForm";
       FormClosing += MainForm_FormClosing;
@@ -308,7 +310,6 @@
         private Panel BottomRightPanel;
         private System.Windows.Forms.Timer SecondTimer;
         private ToolTip MainFormToolTip;
-    private Label label2;
     private ContextMenuStrip CheckContextMenuStrip;
     private ToolStripMenuItem DeleteToolStripMenuItem;
     private ToolStripMenuItem EditToolStripMenuItem;

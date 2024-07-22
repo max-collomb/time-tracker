@@ -1,15 +1,12 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace time_tracker
 {
-    /// <summary>
-    /// Managed equivalent of the Win32 <code>RECT</code> structure.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+  /// <summary>
+  /// Managed equivalent of the Win32 <code>RECT</code> structure.
+  /// </summary>
+  [StructLayout(LayoutKind.Sequential)]
     public struct LtrbRectangle
     {
         public int Left;

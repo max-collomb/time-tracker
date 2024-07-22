@@ -7,10 +7,16 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>resources\shell32_clock.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="resources\shell32_clock.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="WindowsAPICodePackShellExtensions" Version="8.0.5" />
   </ItemGroup>
 

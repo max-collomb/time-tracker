@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Text.RegularExpressions;
 
 namespace time_tracker
 {
@@ -19,11 +13,8 @@ namespace time_tracker
     {
       Date = dateTime.Date;
       SqlDate = dateTime.Date.ToString("yyyy-MM-dd");
-      Checks = checks ?? DataBase.GetEvents(SqlDate);
+      Checks = checks ?? DataBase.GetEvents("usr_check", SqlDate);
       IsInProgress = SqlDate == DateTime.Now.Date.ToString("yyyy-MM-dd") && Checks.Count % 2 == 1;
-      // BEGIN debug
-      IsInProgress = SqlDate == "2024-07-18" && Checks.Count % 2 == 1;
-      // END debug
       TimeChecked = Checks.Count > 0 ? ChecksToTimes() : 0;
     }
     private int ChecksToTimes()

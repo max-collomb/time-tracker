@@ -1,15 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Serilog;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace time_tracker
 {
-  public class Event(string date, string time, string type) : IComparable<Event>
+  public class Event(long id, string date, string time, string type) : IComparable<Event>
   {
+    public long Id { get; set; } = id;
     public string Date { get; set; } = date;
     public string Time { get; set; } = time;
     public string Type { get; set; } = type;
@@ -34,14 +31,6 @@ namespace time_tracker
       sqliteConnection.Open();
       var command = sqliteConnection.CreateCommand();
       command.CommandText = "CREATE TABLE IF NOT EXISTS events (date TEXT, time TEXT, type TEXT);";
-      command.CommandText += "DELETE FROM events WHERE 1;";
-      command.CommandText += "INSERT INTO events (date, time, type) VALUES ";
-      command.CommandText += "(\"2024-07-10\", \"08:15\", \"user_check\"),(\"2024-07-10\", \"12:15\", \"user_check\"),(\"2024-07-15\", \"13:15\", \"user_check\"),(\"2024-07-15\", \"17:00\", \"user_check\"),";
-      command.CommandText += "(\"2024-07-16\", \"08:15\", \"user_check\"),(\"2024-07-16\", \"12:15\", \"user_check\"),(\"2024-07-16\", \"14:00\", \"user_check\"),(\"2024-07-16\", \"17:00\", \"user_check\"),";
-      command.CommandText += "(\"2024-07-17\", \"08:15\", \"user_check\"),(\"2024-07-17\", \"12:15\", \"user_check\"),(\"2024-07-17\", \"13:30\", \"user_check\"),(\"2024-07-17\", \"18:00\", \"user_check\"),";
-      //command.CommandText += "(\"2024-07-18\", \"08:15\", \"user_check\"),(\"2024-07-18\", \"12:15\", \"user_check\"),(\"2024-07-18\", \"13:15\", \"user_check\"),(\"2024-07-18\", \"17:30\", \"user_check\"),";
-      //command.CommandText += "(\"2024-07-19\", \"08:30\", \"user_check\"),(\"2024-07-19\", \"12:00\", \"user_check\"),(\"2024-07-19\", \"14:00\", \"user_check\"),(\"2024-07-19\", \"16:00\", \"user_check\");";
-      command.CommandText += "(\"2024-07-18\", \"08:10\", \"user_check\"),(\"2024-07-18\", \"09:10\", \"user_check\"),(\"2024-07-18\", \"09:20\", \"user_check\"),(\"2024-07-18\", \"10:10\", \"user_check\"),(\"2024-07-18\", \"10:20\", \"user_check\"),(\"2024-07-18\", \"12:15\", \"user_check\"),(\"2024-07-18\", \"13:15\", \"user_check\");";
       command.ExecuteNonQuery();
       // TODO : faire un backup sur U:\
       // https://learn.microsoft.com/fr-fr/dotnet/standard/data/sqlite/backup
@@ -51,18 +40,19 @@ namespace time_tracker
     {
       if (sqliteConnection != null)
       {
-        // TODO vérifier qu'il n'y a pas déjà un événement "user_check" le même jour à la même heure/minute
+        // TODO vérifier qu'il n'y a pas déjà un événement "usr_check" le même jour à la même heure/minute
         DateTime now = DateTime.Now;
         var command = sqliteConnection.CreateCommand();
         command.CommandText = @"INSERT INTO events (date, time, type) VALUES (@date, @time, @type)";
         command.Parameters.AddWithValue("@date", String.IsNullOrEmpty(date) ? $"{now:yyyy-MM-dd}" : date);
         command.Parameters.AddWithValue("@time", String.IsNullOrEmpty(time) ? $"{now:HH:mm}" : time);
-        command.Parameters.AddWithValue("@type", String.IsNullOrEmpty(type) ? "user_check" : type);
+        command.Parameters.AddWithValue("@type", String.IsNullOrEmpty(type) ? "usr_check" : type);
+        Log.Information($"INSERT INTO events (\"{command.Parameters[0].Value}\", \"{command.Parameters[1].Value}\", \"{command.Parameters[2].Value}\");");
         command.ExecuteNonQuery();
       }
     }
 
-    public static void UpdateEvent(Event evt, string time)
+    public static void UpdateEvent(Event evt, string date, string time)
     {
       if (sqliteConnection != null)
       {
@@ -70,11 +60,11 @@ namespace time_tracker
         if (match.Success)
         {
           var command = sqliteConnection.CreateCommand();
-          command.CommandText = @"UPDATE events SET time = @newTime WHERE type = @type AND date = @date AND time = @time";
+          command.CommandText = @"UPDATE events SET time = @newTime, date = @newDate WHERE rowid = @id";
           command.Parameters.AddWithValue("@newTime", time);
-          command.Parameters.AddWithValue("@type", evt.Type);
-          command.Parameters.AddWithValue("@date", evt.Date);
-          command.Parameters.AddWithValue("@time", evt.Time);
+          command.Parameters.AddWithValue("@newDate", date);
+          command.Parameters.AddWithValue("@id", evt.Id);
+          Log.Information($"UPDATE events SET time = \"{command.Parameters[0].Value}\", date = \"{command.Parameters[1].Value}\" WHERE rowid = {command.Parameters[2].Value}; # date was \"{evt.Date}\", time was \"{evt.Time}\"");
           command.ExecuteNonQuery();
         }
       }
@@ -85,36 +75,42 @@ namespace time_tracker
       if (sqliteConnection != null)
       {
         var command = sqliteConnection.CreateCommand();
-        command.CommandText = @"DELETE FROM events WHERE type = @type AND date = @date AND time = @time";
-        command.Parameters.AddWithValue("@type", evt.Type);
-        command.Parameters.AddWithValue("@date", evt.Date);
-        command.Parameters.AddWithValue("@time", evt.Time);
+        command.CommandText = @"DELETE FROM events WHERE rowid = @id";
+        command.Parameters.AddWithValue("@id", evt.Id);
+        Log.Information($"DELETE FROM events WHERE rowid = {command.Parameters[0].Value}; # values were (\"{evt.Date}\", \"{evt.Time}\", \"{evt.Type}\")");
         command.ExecuteNonQuery();
       }
     }
 
-    public static List<Event> GetEvents(string? date1 = null, string? date2 = null)
+    public static List<Event> GetEvents(string? type, string? date1 = null, string? date2 = null)
     {
       List<Event> rows = [];
       if (sqliteConnection != null)
       {
         var command = sqliteConnection.CreateCommand();
-        command.CommandText = @"SELECT date, time, type FROM events";
+        command.CommandText = @"SELECT rowid, date, time, type FROM events";
+        string cond = " WHERE";
+        if (!String.IsNullOrEmpty(type))
+        {
+          command.CommandText += cond + " type = @type";
+          command.Parameters.AddWithValue("@type", type);
+          cond = " AND";
+        }
         if (!String.IsNullOrEmpty(date1) && !String.IsNullOrEmpty(date2))
         {
-          command.CommandText += " WHERE date >= @start AND date <= @end";
+          command.CommandText += cond + " date >= @start AND date <= @end";
           command.Parameters.AddWithValue("@start", date1);
           command.Parameters.AddWithValue("@end", date2);
         }
         else if (!String.IsNullOrEmpty(date1))
         {
-          command.CommandText += " WHERE date = @date";
+          command.CommandText += cond + " date = @date";
           command.Parameters.AddWithValue("@date", date1);
         }
         command.CommandText += " ORDER BY date ASC, time ASC";
         using var reader = command.ExecuteReader();
         while (reader.Read())
-          rows.Add(new Event(reader.GetString(0), reader.GetString(1), reader.GetString(2)));
+          rows.Add(new Event(reader.GetInt64(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
       }
       return rows;
     }

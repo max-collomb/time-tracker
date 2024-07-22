@@ -73,14 +73,14 @@
       BottomPanel.SuspendLayout();
       SuspendLayout();
       // 
-      // TtimeSectionLabel
+      // TimeSectionLabel
       // 
       TimeSectionLabel.AutoSize = true;
       TimeSectionLabel.Dock = DockStyle.Top;
       TimeSectionLabel.ForeColor = Color.White;
       TimeSectionLabel.Location = new Point(10, 10);
       TimeSectionLabel.Margin = new Padding(0);
-      TimeSectionLabel.Name = "TtimeSectionLabel";
+      TimeSectionLabel.Name = "TimeSectionLabel";
       TimeSectionLabel.Padding = new Padding(0, 0, 0, 5);
       TimeSectionLabel.Size = new Size(216, 20);
       TimeSectionLabel.TabIndex = 0;
@@ -424,7 +424,7 @@
       BottomPanel.Size = new Size(336, 30);
       BottomPanel.TabIndex = 5;
       // 
-      // CancelButton
+      // CancelFormButton
       // 
       CancelFormButton.DialogResult = DialogResult.Cancel;
       CancelFormButton.Dock = DockStyle.Right;
@@ -432,7 +432,7 @@
       CancelFormButton.FlatStyle = FlatStyle.Flat;
       CancelFormButton.ForeColor = Color.Transparent;
       CancelFormButton.Location = new Point(176, 0);
-      CancelFormButton.Name = "CancelButton";
+      CancelFormButton.Name = "CancelFormButton";
       CancelFormButton.Size = new Size(75, 30);
       CancelFormButton.TabIndex = 2;
       CancelFormButton.Text = "Annuler";

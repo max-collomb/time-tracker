@@ -1,3 +1,4 @@
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace time_tracker
@@ -17,6 +18,44 @@ namespace time_tracker
       WeekDays = [];
       TodayIdx = -1;
       HoveredDay = -1;
+      CurrentTime = "";
+      Targets = [];
+      DataBase.Initialize(Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "time-tracker.sqlite"));
+      InitializeComponent();
+      LoadSettings();
+      RefreshTimeData();
+      SystemEvents.PowerModeChanged += OnPowerChange;
+      SystemEvents.SessionEnding += OnSessionEnding;
+    }
+
+    private void OnPowerChange(Object sender, PowerModeChangedEventArgs e)
+    {
+      switch (e.Mode)
+      {
+        case PowerModes.Resume:
+          DataBase.InsertEvent("sys_wakeup");
+          break;
+        case PowerModes.Suspend:
+          DataBase.InsertEvent("sys_sleep");
+          break;
+      }
+    }
+
+    private void OnSessionEnding(Object sender, SessionEndingEventArgs e)
+    {
+      switch (e.Reason)
+      {
+        case SessionEndReasons.Logoff:
+          DataBase.InsertEvent("sys_logoff");
+          break;
+        case SessionEndReasons.SystemShutdown:
+          DataBase.InsertEvent("sys_shutdown");
+          break;
+      }
+    }
+
+    private void LoadSettings()
+    {
       Targets = [
         Properties.Settings.Default.MondayTarget,
         Properties.Settings.Default.TuesdayTarget,
@@ -30,18 +69,11 @@ namespace time_tracker
         //TimeHelper.HourMinStrToMin(Properties.Settings.Default.FridayTarget)
       ];
       WeekLoad = Targets.Sum();
-      CurrentTime = "";
-      DataBase.Initialize(Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "time-tracker.sqlite"));
-      InitializeComponent();
-      RefreshTimeData();
     }
 
     private void ClockInOutButton_Click(object? sender, EventArgs e)
     {
-      // BEGIN debug
-      DataBase.InsertEvent("user_check", "2024-07-18");
-      // DataBase.InsertEvent();
-      // END debug
+      DataBase.InsertEvent();
       RefreshTimeData();
     }
 
@@ -52,6 +84,7 @@ namespace time_tracker
 
     private void MainForm_Load(object sender, EventArgs e)
     {
+      DataBase.InsertEvent("sys_appstart");
       Rectangle bounds = new(Properties.Settings.Default.WindowPosition, Size);
       if (Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(bounds)))
       {
@@ -88,6 +121,7 @@ namespace time_tracker
           sum += WeekDays[i].TimeChecked;
         WeekValueLabel.Text = TimeHelper.MinToHourMinStr(sum);
         MainFormToolTip.SetToolTip(WeekValueLabel, WeekValueLabel.Text + " / " + TimeHelper.MinToHourMinStr(WeekLoad));
+        ChartPictureBox.Refresh();
       }
 
       //if (reminderEnabled && reminder != null && DateTime.Now.Hour == reminder.Hour && DateTime.Now.Minute == reminder.Minute)
@@ -111,10 +145,7 @@ namespace time_tracker
       WeekDays = TimeHelper.GetDaysOfWeek(DateTime.Now);
       TodayIdx = -1;
       for (int i = 0; i < WeekDays.Count; i++)
-        // BEGIN debug
-        if (WeekDays[i].SqlDate == "2024-07-18")
-          //if (WeekDays[i].SqlDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
-          // END debug
+        if (WeekDays[i].SqlDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
           TodayIdx = i;
       ClockInOutButton.Image = (WeekDays[TodayIdx].IsInProgress) ? Properties.Resources.pause : Properties.Resources.play;
       if (ThumbnailButton != null)
@@ -229,12 +260,13 @@ namespace time_tracker
       Event? check = (Event?)(((ContextMenuStrip?)((ToolStripMenuItem)sender).Owner)?.SourceControl)?.DataContext;
       if (check != null)
       {
-        string value = check.Time;
-        DialogResult result = InputDialog.Show(ref value);
-        if (result == DialogResult.OK)
+        using (var eventForm = new EventForm(check.Date, check.Time, false))
         {
-          DataBase.UpdateEvent(check, value);
-          RefreshTimeData();
+          if (eventForm.ShowDialog(this) == DialogResult.OK)
+          {
+            DataBase.UpdateEvent(check, eventForm.Date, eventForm.Time);
+            RefreshTimeData();
+          }
         }
       }
 
@@ -245,6 +277,7 @@ namespace time_tracker
       using (SettingsForm settingsForm = new SettingsForm())
       {
         settingsForm.ShowDialog(this);
+        LoadSettings();
         RefreshTimeData();
       }
     }
@@ -252,6 +285,7 @@ namespace time_tracker
     void HistoryForm_Closed(object? sender, FormClosedEventArgs e)
     {
       HistoryForm = null;
+      RefreshTimeData();
     }
 
     private void DetailsButton_Click(object sender, EventArgs e)
