@@ -1,15 +1,29 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.Windows.Controls;
+using System.Windows.Forms;
 
 namespace time_tracker
 {
 
   public partial class HistoryForm : Form
   {
+
+    static Dictionary<string, string> EventTypeDescriptions = new() {
+      { "app_start", "Lancement de l'application" },
+      { "usr_check", "Badgeage" },
+      { "sys_wakeup", "Sortie de veille" },
+      { "sys_sleep", "Mise en veille" },
+      { "sys_logoff", "Déconnexion" },
+      { "sys_shutdown", "Arrêt" },
+      { "sess_lock", "Verrouillage session" },
+      { "sess_unlock", "Déverrouillage session" },
+    };
     public HistoryForm()
     {
       InitializeComponent();
-      SetRangeToolStripMenuItem_Click(ThisWeekToolStripMenuItem, new EventArgs());
+      SelectRangeToolStripMenuItem_Click(ThisWeekToolStripMenuItem, new EventArgs());
     }
 
     public void RefreshEventDataGridView()
@@ -20,7 +34,11 @@ namespace time_tracker
       {
         Event e = events[i];
         //EventsDataGridView.Rows.Add(new string[] { e.Id.ToString(), e.Date, e.Time, e.Type });
-        EventsDataGridView.Rows.Insert(0, [e.Id.ToString(), e.Date, e.Time, e.Type]);
+        EventsDataGridView.Rows.Insert(0, [
+          e.Id.ToString("000000"),
+          e.Date,
+          e.Time,
+          EventTypeDescriptions.TryGetValue(e.Type, out string? value) ? value + " (" + e.Type + ")" : e.Type]);
       }
     }
 
@@ -65,7 +83,7 @@ namespace time_tracker
           //  TimeHelper.MinToHourMinStr(timeChecked)
           //});
           WeekDataGridView.Rows.Insert(0, [
-            ISOWeek.GetWeekOfYear(currentMonday).ToString(),
+            currentMonday.Date.ToString("yy") + "_" + ISOWeek.GetWeekOfYear(currentMonday).ToString("00"),
             currentMonday.ToString("yyyy-MM-dd"),
             TimeHelper.MinToHourMinStr(timeChecked)
           ]);
@@ -74,7 +92,135 @@ namespace time_tracker
       }
     }
 
-    private void SetRangeToolStripMenuItem_Click(object sender, EventArgs e)
+    private void ApplyButton_Click(object sender, EventArgs e)
+    {
+      RefreshEventDataGridView();
+    }
+
+    private void AddEventButton_Click(object sender, EventArgs e)
+    {
+      string date = DateTime.Now.ToString("yyyy-MM-dd");
+      string time = DateTime.Now.ToString("HH:mm");
+      if (EventsDataGridView.SelectedRows.Count > 0)
+      {
+        date = EventsDataGridView.SelectedRows[0].Cells[1].Value.ToString() ?? date;
+        time = EventsDataGridView.SelectedRows[0].Cells[2].Value.ToString() ?? time;
+      }
+      using var eventForm = new EventForm(date, time, true);
+      if (eventForm.ShowDialog(this) == DialogResult.OK)
+      {
+        DataBase.InsertEvent("usr_check", eventForm.Date, eventForm.Time);
+        RefreshEventDataGridView();
+      }
+    }
+
+    private void EditToolStripMenuItem_Click(object? sender, EventArgs e)
+    {
+      if (EventsDataGridView.SelectedRows.Count == 1)
+      {
+        var row = EventsDataGridView.Rows[EventsDataGridView.SelectedRows[0].Index];
+        Event evt = new(
+          Int64.Parse(row.Cells[0].Value.ToString() ?? "-1"),
+          row.Cells[1].Value.ToString() ?? "",
+          row.Cells[2].Value.ToString() ?? "",
+          row.Cells[3].Value.ToString() ?? ""
+        );
+        if (evt.Type == "usr_check")
+        {
+          using (var eventForm = new EventForm(evt.Date, evt.Time, true))
+          {
+            if (eventForm.ShowDialog(this) == DialogResult.OK)
+            {
+              DataBase.UpdateEvent(evt, eventForm.Date, eventForm.Time);
+              RefreshEventDataGridView();
+            }
+          }
+        }
+      }
+    }
+
+    private void EventsDataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        int rowSelected = e.RowIndex;
+        if (e.RowIndex != -1)
+        {
+          EventsDataGridView.ClearSelection();
+          EventsDataGridView.Rows[rowSelected].Selected = true;
+          EditToolStripMenuItem.Enabled = EventsDataGridView.Rows[e.RowIndex].Cells[3].Value.ToString().Contains(" (usr_check)");
+        }
+      }
+    }
+
+    private void DeleteToolStripMenuItem_Click(object? sender, EventArgs e)
+    {
+      if (EventsDataGridView.SelectedRows.Count == 1)
+      {
+        DataBase.DeleteEvent(new(Int64.Parse(EventsDataGridView.Rows[EventsDataGridView.SelectedRows[0].Index].Cells[0].Value.ToString() ?? "-1"), "", "", ""));
+        RefreshEventDataGridView();
+      }
+    }
+
+    private void CloseButton_Click(object sender, EventArgs e)
+    {
+      Close();
+    }
+
+    private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      if (TabControl.SelectedIndex == 1)
+      {
+        RefreshWeekDataGridView();
+      }
+    }
+
+    private void HistoryForm_Load(object sender, EventArgs e)
+    {
+      LogLinkLabel.Text = $"time-tracker-{DateTime.Now.Year}.log";
+      SqliteLinkLabel.Text = Program.DbFileName;
+      foreach (DataGridViewColumn column in EventsDataGridView.Columns)
+      {
+        if (column.Index > 0)
+          column.SortMode = DataGridViewColumnSortMode.NotSortable;
+      }
+    }
+
+    private void LogLinkLabel_Click(object sender, EventArgs e)
+    {
+      //using Process fileopener = new Process();
+
+      //fileopener.StartInfo.FileName = "notepad";
+      //fileopener.StartInfo.Arguments = "\"" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"time-tracker-{DateTime.Now.Year}.log") + "\"";
+      //fileopener.Start();
+      Process.Start("notepad.exe", "\"" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"time-tracker-{DateTime.Now.Year}.log") + "\"");
+    }
+
+    private void SqliteLinkLabel_Click(object sender, EventArgs e)
+    {
+      //using Process fileopener = new Process();
+
+      //fileopener.StartInfo.FileName = "explorer";
+      //fileopener.StartInfo.Arguments = "/select \"" + Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName) + "\"";
+      //fileopener.Start();
+      Process.Start("explorer.exe", "/select, \"" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName) + "\"");
+    }
+
+    private void EventsDataGridView_SelectionChanged(object sender, EventArgs e)
+    {
+      if (EventsDataGridView.SelectedRows.Count > 0)
+      {
+        EditToolStripMenuItem.Enabled = EventsDataGridView.SelectedRows[0].Cells[3].Value.ToString().Contains(" (usr_check)");
+        DeleteToolStripMenuItem.Enabled = true;
+      }
+      else
+      {
+        EditToolStripMenuItem.Enabled = false;
+        DeleteToolStripMenuItem.Enabled = false;
+      }
+    }
+
+    private void SelectRangeToolStripMenuItem_Click(object sender, EventArgs e)
     {
       DateTime start = DateTime.Now.Date;
       DateTime end = DateTime.Now.Date;
@@ -132,139 +278,6 @@ namespace time_tracker
         RefreshEventDataGridView();
       }
       catch { }
-    }
-
-    private void ApplyButton_Click(object sender, EventArgs e)
-    {
-      RefreshEventDataGridView();
-    }
-
-    private void EventsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-    {
-      var senderGrid = (DataGridView)sender;
-
-      if ((senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn) && (e.RowIndex >= 0))
-      {
-        Event evt = new(
-          Int64.Parse(senderGrid.Rows[e.RowIndex].Cells[0].Value.ToString() ?? "-1"),
-          senderGrid.Rows[e.RowIndex].Cells[1].Value.ToString() ?? "",
-          senderGrid.Rows[e.RowIndex].Cells[2].Value.ToString() ?? "",
-          senderGrid.Rows[e.RowIndex].Cells[3].Value.ToString() ?? ""
-        );
-        if (evt.Type == "usr_check")
-        {
-          using (var eventForm = new EventForm(evt.Date, evt.Time, true))
-          {
-            if (eventForm.ShowDialog(this) == DialogResult.OK)
-            {
-              DataBase.UpdateEvent(evt, eventForm.Date, eventForm.Time);
-              RefreshEventDataGridView();
-            }
-          }
-        }
-      }
-    }
-
-    private void AddEventButton_Click(object sender, EventArgs e)
-    {
-      using (var eventForm = new EventForm(DateTime.Now.ToString("yyyy-MM-dd"), DateTime.Now.ToString("HH:mm"), true))
-      {
-        if (eventForm.ShowDialog(this) == DialogResult.OK)
-        {
-          DataBase.InsertEvent("usr_check", eventForm.Date, eventForm.Time);
-          RefreshEventDataGridView();
-        }
-      }
-    }
-
-    private void EditToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      if (EventsDataGridView.SelectedRows.Count == 1)
-      {
-        var row = EventsDataGridView.Rows[EventsDataGridView.SelectedRows[0].Index];
-        Event evt = new(
-          Int64.Parse(row.Cells[0].Value.ToString() ?? "-1"),
-          row.Cells[1].Value.ToString() ?? "",
-          row.Cells[2].Value.ToString() ?? "",
-          row.Cells[3].Value.ToString() ?? ""
-        );
-        if (evt.Type == "usr_check")
-        {
-          using (var eventForm = new EventForm(evt.Date, evt.Time, true))
-          {
-            if (eventForm.ShowDialog(this) == DialogResult.OK)
-            {
-              DataBase.UpdateEvent(evt, eventForm.Date, eventForm.Time);
-              RefreshEventDataGridView();
-            }
-          }
-        }
-      }
-    }
-
-    private void EventsDataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-    {
-      if (e.Button == MouseButtons.Right)
-      {
-        int rowSelected = e.RowIndex;
-        if (e.RowIndex != -1)
-        {
-          EventsDataGridView.ClearSelection();
-          EventsDataGridView.Rows[rowSelected].Selected = true;
-        }
-      }
-    }
-
-    private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      if (EventsDataGridView.SelectedRows.Count == 1)
-      {
-        DataBase.DeleteEvent(new(Int64.Parse(EventsDataGridView.Rows[EventsDataGridView.SelectedRows[0].Index].Cells[0].Value.ToString() ?? "-1"), "", "", ""));
-        RefreshEventDataGridView();
-      }
-    }
-
-    private void CloseButton_Click(object sender, EventArgs e)
-    {
-      Close();
-    }
-
-    private void PredifinedButton_Paint(object sender, PaintEventArgs e)
-    {
-      if (button2.ContextMenuStrip != null)
-      {
-        int arrowX = button2.Width - Padding.Right - 14;
-        int arrowY = (button2.Height / 2) - 1;
-
-        Color color = Enabled ? ForeColor : SystemColors.ControlDark;
-        using (Brush brush = new SolidBrush(color))
-        {
-          Point[] arrows = new Point[] { new Point(arrowX, arrowY), new Point(arrowX + 7, arrowY), new Point(arrowX + 3, arrowY + 4) };
-          e.Graphics.FillPolygon(brush, arrows);
-        }
-      }
-    }
-
-    private void PredifinedButton_MouseDown(object sender, MouseEventArgs e)
-    {
-      if (button2.ContextMenuStrip != null && e.Button == MouseButtons.Left)
-      {
-        Point menuLocation = PointToClient(button2.PointToScreen(new Point(0, button2.Height)));
-        button2.ContextMenuStrip.Show(this, menuLocation);
-      }
-    }
-
-    private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      if (TabControl.SelectedIndex == 0)
-      {
-        AddEventButton.Visible = true;
-      }
-      else
-      {
-        RefreshWeekDataGridView();
-        AddEventButton.Visible = false;
-      }
     }
   }
 }

@@ -33,8 +33,8 @@
       MarginPanel = new Panel();
       SaveButton = new Button();
       TableLayoutPanel = new TableLayoutPanel();
-      TimePicker = new DateTimePicker();
       DatePicker = new DateTimePicker();
+      TimeMaskedTextBox = new MaskedTextBox();
       BottomPanel.SuspendLayout();
       TableLayoutPanel.SuspendLayout();
       SuspendLayout();
@@ -56,11 +56,10 @@
       CancelFormButton.Dock = DockStyle.Right;
       CancelFormButton.FlatAppearance.BorderColor = SystemColors.ButtonShadow;
       CancelFormButton.FlatStyle = FlatStyle.Flat;
-      CancelFormButton.ForeColor = Color.Transparent;
       CancelFormButton.Location = new Point(34, 0);
       CancelFormButton.Name = "CancelFormButton";
       CancelFormButton.Size = new Size(75, 30);
-      CancelFormButton.TabIndex = 2;
+      CancelFormButton.TabIndex = 3;
       CancelFormButton.Text = "Annuler";
       CancelFormButton.UseVisualStyleBackColor = true;
       // 
@@ -78,11 +77,10 @@
       SaveButton.Dock = DockStyle.Right;
       SaveButton.FlatAppearance.BorderColor = SystemColors.ButtonShadow;
       SaveButton.FlatStyle = FlatStyle.Flat;
-      SaveButton.ForeColor = Color.Transparent;
       SaveButton.Location = new Point(119, 0);
       SaveButton.Name = "SaveButton";
       SaveButton.Size = new Size(75, 30);
-      SaveButton.TabIndex = 0;
+      SaveButton.TabIndex = 2;
       SaveButton.Text = "Enregistrer";
       SaveButton.UseVisualStyleBackColor = true;
       SaveButton.Click += SaveButton_Click;
@@ -93,8 +91,8 @@
       TableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110F));
       TableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
       TableLayoutPanel.ColumnStyles.Add(new ColumnStyle());
-      TableLayoutPanel.Controls.Add(TimePicker, 0, 0);
       TableLayoutPanel.Controls.Add(DatePicker, 0, 0);
+      TableLayoutPanel.Controls.Add(TimeMaskedTextBox, 1, 0);
       TableLayoutPanel.Dock = DockStyle.Fill;
       TableLayoutPanel.Location = new Point(10, 10);
       TableLayoutPanel.Margin = new Padding(0);
@@ -103,18 +101,6 @@
       TableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
       TableLayoutPanel.Size = new Size(194, 45);
       TableLayoutPanel.TabIndex = 7;
-      // 
-      // TimePicker
-      // 
-      TimePicker.CustomFormat = "HH:mm";
-      TimePicker.Dock = DockStyle.Fill;
-      TimePicker.Format = DateTimePickerFormat.Custom;
-      TimePicker.Location = new Point(115, 3);
-      TimePicker.Margin = new Padding(5, 3, 0, 3);
-      TimePicker.Name = "TimePicker";
-      TimePicker.ShowUpDown = true;
-      TimePicker.Size = new Size(79, 23);
-      TimePicker.TabIndex = 2;
       // 
       // DatePicker
       // 
@@ -127,23 +113,39 @@
       DatePicker.Size = new Size(105, 23);
       DatePicker.TabIndex = 1;
       // 
+      // TimeMaskedTextBox
+      // 
+      TimeMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      TimeMaskedTextBox.Location = new Point(113, 3);
+      TimeMaskedTextBox.Mask = "00:00";
+      TimeMaskedTextBox.Name = "TimeMaskedTextBox";
+      TimeMaskedTextBox.Size = new Size(78, 23);
+      TimeMaskedTextBox.TabIndex = 2;
+      TimeMaskedTextBox.ValidatingType = typeof(DateTime);
+      TimeMaskedTextBox.KeyDown += TimeMaskedTextBox_KeyDown;
+      // 
       // EventForm
       // 
+      AcceptButton = SaveButton;
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
-      BackColor = Color.FromArgb(34, 34, 34);
+      CancelButton = CancelFormButton;
       ClientSize = new Size(214, 95);
       Controls.Add(TableLayoutPanel);
       Controls.Add(BottomPanel);
-      ForeColor = Color.White;
       FormBorderStyle = FormBorderStyle.FixedSingle;
+      MaximizeBox = false;
+      MinimizeBox = false;
       Name = "EventForm";
       Padding = new Padding(10);
+      ShowIcon = false;
+      ShowInTaskbar = false;
       StartPosition = FormStartPosition.CenterParent;
       Text = "Evénément";
       Load += EventForm_Load;
       BottomPanel.ResumeLayout(false);
       TableLayoutPanel.ResumeLayout(false);
+      TableLayoutPanel.PerformLayout();
       ResumeLayout(false);
     }
 
@@ -153,7 +155,7 @@
     private Panel MarginPanel;
     private Button SaveButton;
     private TableLayoutPanel TableLayoutPanel;
-    private DateTimePicker TimePicker;
     private DateTimePicker DatePicker;
+    private MaskedTextBox TimeMaskedTextBox;
   }
 }

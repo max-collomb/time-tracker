@@ -30,16 +30,16 @@
     {
       TimeSectionLabel = new Label();
       TimeTableLayoutPanel = new TableLayoutPanel();
+      TuesdayMaskedTextBox = new MaskedTextBox();
+      MondayMaskedTextBox = new MaskedTextBox();
+      WednesdayMaskedTextBox = new MaskedTextBox();
+      FridayMaskedTextBox = new MaskedTextBox();
+      ThursdayMaskedTextBox = new MaskedTextBox();
       MondayTimeLabel = new Label();
       TuesdayTimeLabel = new Label();
       WednesdayTimeLabel = new Label();
       ThursdayTimeLabel = new Label();
       FridayTimeLabel = new Label();
-      MondayTimeUpDdown = new NumericUpDown();
-      TuesdayTimeUpDdown = new NumericUpDown();
-      WednesdayTimeUpDdown = new NumericUpDown();
-      ThursdayTimeUpDdown = new NumericUpDown();
-      FridayTimeUpDdown = new NumericUpDown();
       PauseTableLayoutPanel = new TableLayoutPanel();
       MondayPauseLabel = new Label();
       TuesdayPauseLabel = new Label();
@@ -58,12 +58,8 @@
       MarginPanel = new Panel();
       SaveButton = new Button();
       ProductNameLabel = new Label();
+      AutoStartCheckBox = new CheckBox();
       TimeTableLayoutPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)MondayTimeUpDdown).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)TuesdayTimeUpDdown).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)WednesdayTimeUpDdown).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)ThursdayTimeUpDdown).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)FridayTimeUpDdown).BeginInit();
       PauseTableLayoutPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)MondayPauseUpDown).BeginInit();
       ((System.ComponentModel.ISupportInitialize)TuesdayPauseUpDown).BeginInit();
@@ -82,9 +78,9 @@
       TimeSectionLabel.Margin = new Padding(0);
       TimeSectionLabel.Name = "TimeSectionLabel";
       TimeSectionLabel.Padding = new Padding(0, 0, 0, 5);
-      TimeSectionLabel.Size = new Size(216, 20);
+      TimeSectionLabel.Size = new Size(146, 20);
       TimeSectionLabel.TabIndex = 0;
-      TimeSectionLabel.Text = "Temps de travail théorique (en minutes)";
+      TimeSectionLabel.Text = "Temps de travail théorique";
       // 
       // TimeTableLayoutPanel
       // 
@@ -94,24 +90,90 @@
       TimeTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
       TimeTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
       TimeTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+      TimeTableLayoutPanel.Controls.Add(TuesdayMaskedTextBox, 1, 1);
+      TimeTableLayoutPanel.Controls.Add(MondayMaskedTextBox, 0, 1);
+      TimeTableLayoutPanel.Controls.Add(WednesdayMaskedTextBox, 2, 1);
+      TimeTableLayoutPanel.Controls.Add(FridayMaskedTextBox, 4, 1);
+      TimeTableLayoutPanel.Controls.Add(ThursdayMaskedTextBox, 3, 1);
       TimeTableLayoutPanel.Controls.Add(MondayTimeLabel, 0, 0);
       TimeTableLayoutPanel.Controls.Add(TuesdayTimeLabel, 1, 0);
       TimeTableLayoutPanel.Controls.Add(WednesdayTimeLabel, 2, 0);
       TimeTableLayoutPanel.Controls.Add(ThursdayTimeLabel, 3, 0);
       TimeTableLayoutPanel.Controls.Add(FridayTimeLabel, 4, 0);
-      TimeTableLayoutPanel.Controls.Add(MondayTimeUpDdown, 0, 1);
-      TimeTableLayoutPanel.Controls.Add(TuesdayTimeUpDdown, 1, 1);
-      TimeTableLayoutPanel.Controls.Add(WednesdayTimeUpDdown, 2, 1);
-      TimeTableLayoutPanel.Controls.Add(ThursdayTimeUpDdown, 3, 1);
-      TimeTableLayoutPanel.Controls.Add(FridayTimeUpDdown, 4, 1);
       TimeTableLayoutPanel.Dock = DockStyle.Top;
       TimeTableLayoutPanel.Location = new Point(10, 30);
       TimeTableLayoutPanel.Name = "TimeTableLayoutPanel";
       TimeTableLayoutPanel.RowCount = 2;
       TimeTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
       TimeTableLayoutPanel.RowStyles.Add(new RowStyle());
+      TimeTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
       TimeTableLayoutPanel.Size = new Size(336, 50);
       TimeTableLayoutPanel.TabIndex = 1;
+      // 
+      // TuesdayMaskedTextBox
+      // 
+      TuesdayMaskedTextBox.BackColor = Color.FromArgb(51, 51, 51);
+      TuesdayMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      TuesdayMaskedTextBox.Dock = DockStyle.Fill;
+      TuesdayMaskedTextBox.ForeColor = Color.Silver;
+      TuesdayMaskedTextBox.Location = new Point(70, 23);
+      TuesdayMaskedTextBox.Mask = "00:00";
+      TuesdayMaskedTextBox.Name = "TuesdayMaskedTextBox";
+      TuesdayMaskedTextBox.Size = new Size(61, 23);
+      TuesdayMaskedTextBox.TabIndex = 16;
+      TuesdayMaskedTextBox.ValidatingType = typeof(DateTime);
+      // 
+      // MondayMaskedTextBox
+      // 
+      MondayMaskedTextBox.BackColor = Color.FromArgb(51, 51, 51);
+      MondayMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      MondayMaskedTextBox.Dock = DockStyle.Fill;
+      MondayMaskedTextBox.ForeColor = Color.Silver;
+      MondayMaskedTextBox.Location = new Point(3, 23);
+      MondayMaskedTextBox.Mask = "00:00";
+      MondayMaskedTextBox.Name = "MondayMaskedTextBox";
+      MondayMaskedTextBox.Size = new Size(61, 23);
+      MondayMaskedTextBox.TabIndex = 15;
+      MondayMaskedTextBox.ValidatingType = typeof(DateTime);
+      // 
+      // WednesdayMaskedTextBox
+      // 
+      WednesdayMaskedTextBox.BackColor = Color.FromArgb(51, 51, 51);
+      WednesdayMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      WednesdayMaskedTextBox.Dock = DockStyle.Fill;
+      WednesdayMaskedTextBox.ForeColor = Color.Silver;
+      WednesdayMaskedTextBox.Location = new Point(137, 23);
+      WednesdayMaskedTextBox.Mask = "00:00";
+      WednesdayMaskedTextBox.Name = "WednesdayMaskedTextBox";
+      WednesdayMaskedTextBox.Size = new Size(61, 23);
+      WednesdayMaskedTextBox.TabIndex = 12;
+      WednesdayMaskedTextBox.ValidatingType = typeof(DateTime);
+      // 
+      // FridayMaskedTextBox
+      // 
+      FridayMaskedTextBox.BackColor = Color.FromArgb(51, 51, 51);
+      FridayMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      FridayMaskedTextBox.Dock = DockStyle.Fill;
+      FridayMaskedTextBox.ForeColor = Color.Silver;
+      FridayMaskedTextBox.Location = new Point(271, 23);
+      FridayMaskedTextBox.Mask = "00:00";
+      FridayMaskedTextBox.Name = "FridayMaskedTextBox";
+      FridayMaskedTextBox.Size = new Size(62, 23);
+      FridayMaskedTextBox.TabIndex = 11;
+      FridayMaskedTextBox.ValidatingType = typeof(DateTime);
+      // 
+      // ThursdayMaskedTextBox
+      // 
+      ThursdayMaskedTextBox.BackColor = Color.FromArgb(51, 51, 51);
+      ThursdayMaskedTextBox.BorderStyle = BorderStyle.FixedSingle;
+      ThursdayMaskedTextBox.Dock = DockStyle.Fill;
+      ThursdayMaskedTextBox.ForeColor = Color.Silver;
+      ThursdayMaskedTextBox.Location = new Point(204, 23);
+      ThursdayMaskedTextBox.Mask = "00:00";
+      ThursdayMaskedTextBox.Name = "ThursdayMaskedTextBox";
+      ThursdayMaskedTextBox.Size = new Size(61, 23);
+      ThursdayMaskedTextBox.TabIndex = 10;
+      ThursdayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // MondayTimeLabel
       // 
@@ -167,71 +229,6 @@
       FridayTimeLabel.Size = new Size(53, 15);
       FridayTimeLabel.TabIndex = 4;
       FridayTimeLabel.Text = "Vendredi";
-      // 
-      // MondayTimeUpDdown
-      // 
-      MondayTimeUpDdown.BackColor = Color.FromArgb(51, 51, 51);
-      MondayTimeUpDdown.BorderStyle = BorderStyle.FixedSingle;
-      MondayTimeUpDdown.ForeColor = Color.Silver;
-      MondayTimeUpDdown.Location = new Point(3, 23);
-      MondayTimeUpDdown.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
-      MondayTimeUpDdown.Minimum = new decimal(new int[] { 240, 0, 0, 0 });
-      MondayTimeUpDdown.Name = "MondayTimeUpDdown";
-      MondayTimeUpDdown.Size = new Size(61, 23);
-      MondayTimeUpDdown.TabIndex = 5;
-      MondayTimeUpDdown.Value = new decimal(new int[] { 420, 0, 0, 0 });
-      // 
-      // TuesdayTimeUpDdown
-      // 
-      TuesdayTimeUpDdown.BackColor = Color.FromArgb(51, 51, 51);
-      TuesdayTimeUpDdown.BorderStyle = BorderStyle.FixedSingle;
-      TuesdayTimeUpDdown.ForeColor = Color.Silver;
-      TuesdayTimeUpDdown.Location = new Point(70, 23);
-      TuesdayTimeUpDdown.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
-      TuesdayTimeUpDdown.Minimum = new decimal(new int[] { 240, 0, 0, 0 });
-      TuesdayTimeUpDdown.Name = "TuesdayTimeUpDdown";
-      TuesdayTimeUpDdown.Size = new Size(61, 23);
-      TuesdayTimeUpDdown.TabIndex = 6;
-      TuesdayTimeUpDdown.Value = new decimal(new int[] { 420, 0, 0, 0 });
-      // 
-      // WednesdayTimeUpDdown
-      // 
-      WednesdayTimeUpDdown.BackColor = Color.FromArgb(51, 51, 51);
-      WednesdayTimeUpDdown.BorderStyle = BorderStyle.FixedSingle;
-      WednesdayTimeUpDdown.ForeColor = Color.Silver;
-      WednesdayTimeUpDdown.Location = new Point(137, 23);
-      WednesdayTimeUpDdown.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
-      WednesdayTimeUpDdown.Minimum = new decimal(new int[] { 240, 0, 0, 0 });
-      WednesdayTimeUpDdown.Name = "WednesdayTimeUpDdown";
-      WednesdayTimeUpDdown.Size = new Size(61, 23);
-      WednesdayTimeUpDdown.TabIndex = 7;
-      WednesdayTimeUpDdown.Value = new decimal(new int[] { 420, 0, 0, 0 });
-      // 
-      // ThursdayTimeUpDdown
-      // 
-      ThursdayTimeUpDdown.BackColor = Color.FromArgb(51, 51, 51);
-      ThursdayTimeUpDdown.BorderStyle = BorderStyle.FixedSingle;
-      ThursdayTimeUpDdown.ForeColor = Color.Silver;
-      ThursdayTimeUpDdown.Location = new Point(204, 23);
-      ThursdayTimeUpDdown.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
-      ThursdayTimeUpDdown.Minimum = new decimal(new int[] { 240, 0, 0, 0 });
-      ThursdayTimeUpDdown.Name = "ThursdayTimeUpDdown";
-      ThursdayTimeUpDdown.Size = new Size(61, 23);
-      ThursdayTimeUpDdown.TabIndex = 8;
-      ThursdayTimeUpDdown.Value = new decimal(new int[] { 420, 0, 0, 0 });
-      // 
-      // FridayTimeUpDdown
-      // 
-      FridayTimeUpDdown.BackColor = Color.FromArgb(51, 51, 51);
-      FridayTimeUpDdown.BorderStyle = BorderStyle.FixedSingle;
-      FridayTimeUpDdown.ForeColor = Color.Silver;
-      FridayTimeUpDdown.Location = new Point(271, 23);
-      FridayTimeUpDdown.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
-      FridayTimeUpDdown.Minimum = new decimal(new int[] { 240, 0, 0, 0 });
-      FridayTimeUpDdown.Name = "FridayTimeUpDdown";
-      FridayTimeUpDdown.Size = new Size(62, 23);
-      FridayTimeUpDdown.TabIndex = 9;
-      FridayTimeUpDdown.Value = new decimal(new int[] { 420, 0, 0, 0 });
       // 
       // PauseTableLayoutPanel
       // 
@@ -404,7 +401,7 @@
       AutoReminderCheckBox.Dock = DockStyle.Top;
       AutoReminderCheckBox.FlatAppearance.BorderColor = Color.White;
       AutoReminderCheckBox.FlatStyle = FlatStyle.Flat;
-      AutoReminderCheckBox.Location = new Point(10, 165);
+      AutoReminderCheckBox.Location = new Point(10, 199);
       AutoReminderCheckBox.Name = "AutoReminderCheckBox";
       AutoReminderCheckBox.Padding = new Padding(0, 15, 0, 0);
       AutoReminderCheckBox.Size = new Size(336, 34);
@@ -419,7 +416,7 @@
       BottomPanel.Controls.Add(MarginPanel);
       BottomPanel.Controls.Add(SaveButton);
       BottomPanel.Dock = DockStyle.Bottom;
-      BottomPanel.Location = new Point(10, 249);
+      BottomPanel.Location = new Point(10, 285);
       BottomPanel.Name = "BottomPanel";
       BottomPanel.Size = new Size(336, 30);
       BottomPanel.TabIndex = 5;
@@ -465,7 +462,7 @@
       // 
       ProductNameLabel.Dock = DockStyle.Bottom;
       ProductNameLabel.ForeColor = Color.DimGray;
-      ProductNameLabel.Location = new Point(10, 224);
+      ProductNameLabel.Location = new Point(10, 260);
       ProductNameLabel.Name = "ProductNameLabel";
       ProductNameLabel.Padding = new Padding(0, 0, 0, 10);
       ProductNameLabel.Size = new Size(336, 25);
@@ -473,15 +470,30 @@
       ProductNameLabel.Text = "Time Tracker v0.1";
       ProductNameLabel.TextAlign = ContentAlignment.TopRight;
       // 
+      // AutoStartCheckBox
+      // 
+      AutoStartCheckBox.AutoSize = true;
+      AutoStartCheckBox.Dock = DockStyle.Top;
+      AutoStartCheckBox.FlatAppearance.BorderColor = Color.White;
+      AutoStartCheckBox.FlatStyle = FlatStyle.Flat;
+      AutoStartCheckBox.Location = new Point(10, 165);
+      AutoStartCheckBox.Name = "AutoStartCheckBox";
+      AutoStartCheckBox.Padding = new Padding(0, 15, 0, 0);
+      AutoStartCheckBox.Size = new Size(336, 34);
+      AutoStartCheckBox.TabIndex = 7;
+      AutoStartCheckBox.Text = "Démarrer avec windows";
+      AutoStartCheckBox.UseVisualStyleBackColor = true;
+      // 
       // SettingsForm
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.FromArgb(34, 34, 34);
-      ClientSize = new Size(356, 289);
+      ClientSize = new Size(356, 325);
+      Controls.Add(AutoReminderCheckBox);
+      Controls.Add(AutoStartCheckBox);
       Controls.Add(ProductNameLabel);
       Controls.Add(BottomPanel);
-      Controls.Add(AutoReminderCheckBox);
       Controls.Add(PauseTableLayoutPanel);
       Controls.Add(PauseSectionLabel);
       Controls.Add(TimeTableLayoutPanel);
@@ -495,11 +507,6 @@
       Load += SettingsForm_Load;
       TimeTableLayoutPanel.ResumeLayout(false);
       TimeTableLayoutPanel.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)MondayTimeUpDdown).EndInit();
-      ((System.ComponentModel.ISupportInitialize)TuesdayTimeUpDdown).EndInit();
-      ((System.ComponentModel.ISupportInitialize)WednesdayTimeUpDdown).EndInit();
-      ((System.ComponentModel.ISupportInitialize)ThursdayTimeUpDdown).EndInit();
-      ((System.ComponentModel.ISupportInitialize)FridayTimeUpDdown).EndInit();
       PauseTableLayoutPanel.ResumeLayout(false);
       PauseTableLayoutPanel.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)MondayPauseUpDown).EndInit();
@@ -521,11 +528,6 @@
     private Label WednesdayTimeLabel;
     private Label ThursdayTimeLabel;
     private Label FridayTimeLabel;
-    private NumericUpDown MondayTimeUpDdown;
-    private NumericUpDown TuesdayTimeUpDdown;
-    private NumericUpDown WednesdayTimeUpDdown;
-    private NumericUpDown ThursdayTimeUpDdown;
-    private NumericUpDown FridayTimeUpDdown;
     private TableLayoutPanel PauseTableLayoutPanel;
     private Label MondayPauseLabel;
     private Label TuesdayPauseLabel;
@@ -544,5 +546,11 @@
     private Button CancelFormButton;
     private Panel MarginPanel;
     private Button SaveButton;
+    private MaskedTextBox WednesdayMaskedTextBox;
+    private MaskedTextBox FridayMaskedTextBox;
+    private MaskedTextBox ThursdayMaskedTextBox;
+    private MaskedTextBox TuesdayMaskedTextBox;
+    private MaskedTextBox MondayMaskedTextBox;
+    private CheckBox AutoStartCheckBox;
   }
 }

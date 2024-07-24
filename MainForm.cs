@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using System.Drawing.Drawing2D;
 
 namespace time_tracker
 {
@@ -10,22 +11,46 @@ namespace time_tracker
     public int HoveredDay { get; set; }
     public List<int> Targets { get; set; }
     public int WeekLoad { get; set; }
+    public int CurrentDate { get; set; }
     public string CurrentTime { get; set; }
+    public bool? IsInProgress { get; set; }
     public HistoryForm? HistoryForm { get; set; }
     public ThumbnailToolBarButton? ThumbnailButton { get; set; }
+    public int DayContextMenu {  get; set; }
     public MainForm()
     {
       WeekDays = [];
       TodayIdx = -1;
       HoveredDay = -1;
       CurrentTime = "";
+      CurrentDate = -1;
+      IsInProgress = null;
       Targets = [];
-      DataBase.Initialize(Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "time-tracker.sqlite"));
+      string dbFileName = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName);
+      bool openSettingsForm = !File.Exists(dbFileName);
+      DataBase.Initialize(dbFileName);
       InitializeComponent();
+      DataBase.InsertDaysOff();
       LoadSettings();
       RefreshTimeData();
       SystemEvents.PowerModeChanged += OnPowerChange;
       SystemEvents.SessionEnding += OnSessionEnding;
+      SystemEvents.SessionSwitch += OnSessionSwitch;
+      if (openSettingsForm)
+        OptionsButton_Click(OptionsButton, new EventArgs());
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+      if (m.Msg == NativeMethods.WM_SHOWME)
+      {
+        if (WindowState == FormWindowState.Minimized)
+          WindowState = FormWindowState.Normal;
+        bool top = TopMost; // get our current "TopMost" value (ours will always be false though)
+        TopMost = true; // make our form jump to the top of everything
+        TopMost = top; // set it back to whatever it was
+      }
+      base.WndProc(ref m);
     }
 
     private void OnPowerChange(Object sender, PowerModeChangedEventArgs e)
@@ -54,6 +79,19 @@ namespace time_tracker
       }
     }
 
+    private void OnSessionSwitch(Object sender, SessionSwitchEventArgs e)
+    {
+      switch (e.Reason)
+      {
+        case SessionSwitchReason.SessionLock:
+          DataBase.InsertEvent("sess_lock");
+          break;
+        case SessionSwitchReason.SessionUnlock:
+          DataBase.InsertEvent("sess_unlock");
+          break;
+      }
+    }
+
     private void LoadSettings()
     {
       Targets = [
@@ -69,6 +107,7 @@ namespace time_tracker
         //TimeHelper.HourMinStrToMin(Properties.Settings.Default.FridayTarget)
       ];
       WeekLoad = Targets.Sum();
+      Day.WeekLoad = WeekLoad;
     }
 
     private void ClockInOutButton_Click(object? sender, EventArgs e)
@@ -84,7 +123,9 @@ namespace time_tracker
 
     private void MainForm_Load(object sender, EventArgs e)
     {
-      DataBase.InsertEvent("sys_appstart");
+#if !DEBUG
+      DataBase.InsertEvent("app_start");
+#endif
       Rectangle bounds = new(Properties.Settings.Default.WindowPosition, Size);
       if (Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(bounds)))
       {
@@ -110,15 +151,23 @@ namespace time_tracker
     {
       string currentTime = DateTime.Now.Hour.ToString("00") + ":" + DateTime.Now.Minute.ToString("00");
       Text = currentTime + ":" + DateTime.Now.Second.ToString("00");
+      if (CurrentDate != DateTime.Now.DayOfYear)
+      {
+        DataBase.InsertDaysOff();
+        RefreshTimeData();
+        return;
+      }
       if (currentTime != CurrentTime && TodayIdx >= 0)
       {
         CurrentTime = currentTime;
         WeekDays[TodayIdx].Refresh();
-        DayValueLabel.Text = TimeHelper.MinToHourMinStr(WeekDays[TodayIdx].TimeChecked);
+        DayValueLabel.Text = TimeHelper.MinToHourMinStr(WeekDays[TodayIdx].TimeChecked + WeekDays[TodayIdx].TimeOff);
         MainFormToolTip.SetToolTip(DayValueLabel, DayValueLabel.Text + " / " + TimeHelper.MinToHourMinStr(Targets[TodayIdx]));
         int sum = 0;
         for (int i = 0; i <= TodayIdx; i++)
-          sum += WeekDays[i].TimeChecked;
+          sum += WeekDays[i].TimeChecked + WeekDays[i].TimeOff;
+        for (int i = TodayIdx + 1; i < 5; i++)
+          sum += WeekDays[i].TimeOff;
         WeekValueLabel.Text = TimeHelper.MinToHourMinStr(sum);
         MainFormToolTip.SetToolTip(WeekValueLabel, WeekValueLabel.Text + " / " + TimeHelper.MinToHourMinStr(WeekLoad));
         ChartPictureBox.Refresh();
@@ -147,26 +196,39 @@ namespace time_tracker
       for (int i = 0; i < WeekDays.Count; i++)
         if (WeekDays[i].SqlDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
           TodayIdx = i;
-      ClockInOutButton.Image = (WeekDays[TodayIdx].IsInProgress) ? Properties.Resources.pause : Properties.Resources.play;
-      if (ThumbnailButton != null)
-        ThumbnailButton.Icon = (WeekDays[TodayIdx].IsInProgress) ? Properties.Resources.pause1 : Properties.Resources.play1;
+      if (IsInProgress != WeekDays[TodayIdx].IsInProgress)
+      {
+        IsInProgress = WeekDays[TodayIdx].IsInProgress;
+        ClockInOutButton.Image = IsInProgress == true ? Properties.Resources.pause : Properties.Resources.play;
+        if (TaskbarManager.IsPlatformSupported && ThumbnailButton != null)
+          try
+          {
+            ThumbnailButton.Icon = IsInProgress == true ? Properties.Resources.pause1 : Properties.Resources.play1;
+          }
+          catch { }
+      }
 
       CenterFlowLayoutPanel.Controls.Clear();
       bool isOut = false;
       foreach (Event check in WeekDays[TodayIdx].Checks)
       {
-        Label checkLabel = new();
-        checkLabel.Text = check.Time;
-        checkLabel.AutoSize = true;
-        checkLabel.Margin = new Padding(0, 0, 0, 0);
-        checkLabel.ForeColor = isOut ? Color.Orange : Color.MediumTurquoise;
-        checkLabel.ContextMenuStrip = CheckContextMenuStrip;
-        checkLabel.DataContext = check;
+        Label checkLabel = new()
+        {
+          Text = check.Time,
+          AutoSize = true,
+          Margin = new Padding(0, 0, 0, 0),
+          ForeColor = isOut ? Color.Orange : Color.MediumTurquoise,
+          ContextMenuStrip = CheckContextMenuStrip,
+          DataContext = check
+        };
+        checkLabel.DoubleClick += CheckLabelDoubleClick;
         CenterFlowLayoutPanel.Controls.Add(checkLabel);
+        MainFormToolTip.SetToolTip(checkLabel, (isOut ? "Sortie" : "Entrée") + "\n(Double-clic ou menu contextuel pour modifier)");
         isOut = !isOut;
       }
 
       CurrentTime = string.Empty;
+      CurrentDate = DateTime.Now.DayOfYear;
       SecondTimer_Tick(new object(), new EventArgs());
       ChartPictureBox.Refresh();
     }
@@ -187,14 +249,22 @@ namespace time_tracker
       Pen targetPen = new(Color.FromArgb(100, 187, 205), 1);
       Pen borderPen = new(Color.FromArgb(21, 29, 39));
       SolidBrush fillBrush = new(Color.FromArgb(37, 70, 77));
+      HatchBrush hatchBrush = new(HatchStyle.WideUpwardDiagonal, Color.FromArgb(37, 70, 77), BackColor);
+      SolidBrush fillBrushHl = new(Color.FromArgb(100, 187, 205));
       for (int i = 0; i < 5; i++)
       {
+        int offHeight = 0;
+        if (WeekDays[i].TimeOff > 0)
+        {
+          offHeight = Math.Min(barHeight * WeekDays[i].TimeOff / maxDone, barHeight);
+          g.FillRectangle(hatchBrush, new RectangleF(margin + i * barWidth + padding, labelHeight + barHeight - offHeight, barWidth - 2 * padding, offHeight));
+        }
         if (WeekDays[i].TimeChecked > 0)
         {
           int doneHeight = Math.Min(barHeight * WeekDays[i].TimeChecked / maxDone, barHeight);
-          g.FillRectangle(fillBrush, new RectangleF(margin + i * barWidth + padding, labelHeight + barHeight - doneHeight, barWidth - 2 * padding, doneHeight));
+          g.FillRectangle(fillBrush, new RectangleF(margin + i * barWidth + padding, labelHeight + barHeight - doneHeight - offHeight, barWidth - 2 * padding, doneHeight));
         }
-        g.DrawString(days[i], this.Font, fillBrush, margin + padding + i * barWidth, 2);
+        g.DrawString(days[i], this.Font, i == TodayIdx ? fillBrushHl : fillBrush, margin + padding + i * barWidth, 2);
         g.DrawRectangle(borderPen, new RectangleF(margin + i * barWidth, 0, barWidth, barHeight + labelHeight));
         int targetHeight = barHeight * Targets[i] / maxDone;
         g.DrawLine(targetPen, margin + i * barWidth, labelHeight + barHeight - targetHeight, margin + (i + 1) * barWidth, labelHeight + barHeight - targetHeight);
@@ -222,8 +292,8 @@ namespace time_tracker
         if (day >= 0 && day < 5)
         {
           tooltipContent = WeekDays[day].Date.ToString("ddd dd/MM");
-          if (WeekDays[day].TimeChecked > 0)
-            tooltipContent += "\n" + TimeHelper.MinToHourMinStr(WeekDays[day].TimeChecked) + " / " + TimeHelper.MinToHourMinStr(Targets[day]);
+          if (WeekDays[day].TimeChecked + WeekDays[day].TimeOff > 0)
+            tooltipContent += "\n" + TimeHelper.MinToHourMinStr(WeekDays[day].TimeChecked + WeekDays[day].TimeOff) + " / " + TimeHelper.MinToHourMinStr(Targets[day]);
           if (WeekDays[day].Checks.Count > 0)
           {
             tooltipContent += "\n";
@@ -269,7 +339,22 @@ namespace time_tracker
           }
         }
       }
+    }
 
+    private void CheckLabelDoubleClick(object? sender, EventArgs e)
+    {
+      Event? check = (Event?)((Label?)sender)?.DataContext;
+      if (check != null)
+      {
+        using (var eventForm = new EventForm(check.Date, check.Time, false))
+        {
+          if (eventForm.ShowDialog(this) == DialogResult.OK)
+          {
+            DataBase.UpdateEvent(check, eventForm.Date, eventForm.Time);
+            RefreshTimeData();
+          }
+        }
+      }
     }
 
     private void OptionsButton_Click(object sender, EventArgs e)
@@ -295,5 +380,48 @@ namespace time_tracker
       HistoryForm.Show();
     }
 
+    private void ChartPictureBox_MouseDown(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        DayContextMenu = -1;
+        int margin = 10;
+        int chartWidth = 180;
+        int barWidth = (chartWidth - margin) / 5;
+
+        int day = -1;
+        string tooltipContent = string.Empty;
+
+        if (e.X >= margin)
+        {
+          day = (e.X - margin) / barWidth;
+          if (day >= 0 && day < 5)
+          {
+            DayContextMenu = day;
+            DayDateToolStripMenuItem.Text = WeekDays[day].Date.ToString("dddd dd/MM");
+            DayHalfOffToolStripMenuItem.Checked = WeekDays[day].Annotation?.Type == "half_day_off";
+            DayOffToolStripMenuItem.Checked = WeekDays[day].Annotation?.Type == "day_off";
+          }
+        }
+      }
+    }
+
+    private void DayOffToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (DayContextMenu >= 0 && DayContextMenu < 5)
+      {
+        string type = (sender == DayHalfOffToolStripMenuItem) ? "half_day_off" : "day_off";
+        if (WeekDays[DayContextMenu].Annotation?.Type == type)
+          DataBase.DeleteAnnotation(WeekDays[DayContextMenu].Annotation!);
+        else
+        {
+          if (WeekDays[DayContextMenu].Annotation != null)
+            DataBase.UpdateAnnotation(WeekDays[DayContextMenu].Annotation!, WeekDays[DayContextMenu].Annotation!.Date, type, "");
+          else
+            DataBase.InsertAnnotation(WeekDays[DayContextMenu].SqlDate, type, "");
+        }
+        RefreshTimeData();
+      }
+    }
   }
 }

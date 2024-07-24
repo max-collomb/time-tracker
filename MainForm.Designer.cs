@@ -31,6 +31,11 @@
       components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       ChartPictureBox = new PictureBox();
+      DayContextMenuStrip = new ContextMenuStrip(components);
+      DayDateToolStripMenuItem = new ToolStripMenuItem();
+      toolStripSeparator1 = new ToolStripSeparator();
+      DayHalfOffToolStripMenuItem = new ToolStripMenuItem();
+      DayOffToolStripMenuItem = new ToolStripMenuItem();
       ClockInOutButton = new Button();
       TopPanel = new Panel();
       TopTableLayoutPanel = new TableLayoutPanel();
@@ -50,6 +55,7 @@
       SecondTimer = new System.Windows.Forms.Timer(components);
       MainFormToolTip = new ToolTip(components);
       ((System.ComponentModel.ISupportInitialize)ChartPictureBox).BeginInit();
+      DayContextMenuStrip.SuspendLayout();
       TopPanel.SuspendLayout();
       TopTableLayoutPanel.SuspendLayout();
       CheckContextMenuStrip.SuspendLayout();
@@ -59,6 +65,7 @@
       // 
       // ChartPictureBox
       // 
+      ChartPictureBox.ContextMenuStrip = DayContextMenuStrip;
       ChartPictureBox.Dock = DockStyle.Left;
       ChartPictureBox.Location = new Point(0, 0);
       ChartPictureBox.Name = "ChartPictureBox";
@@ -66,8 +73,41 @@
       ChartPictureBox.TabIndex = 1;
       ChartPictureBox.TabStop = false;
       ChartPictureBox.Paint += ChartPictureBox_Paint;
+      ChartPictureBox.MouseDown += ChartPictureBox_MouseDown;
       ChartPictureBox.MouseLeave += ChartPictureBox_MouseLeave;
       ChartPictureBox.MouseMove += ChartPictureBox_MouseMove;
+      // 
+      // DayContextMenuStrip
+      // 
+      DayContextMenuStrip.Items.AddRange(new ToolStripItem[] { DayDateToolStripMenuItem, toolStripSeparator1, DayHalfOffToolStripMenuItem, DayOffToolStripMenuItem });
+      DayContextMenuStrip.Name = "DayContextMenuStrip";
+      DayContextMenuStrip.Size = new Size(194, 76);
+      // 
+      // DayDateToolStripMenuItem
+      // 
+      DayDateToolStripMenuItem.Enabled = false;
+      DayDateToolStripMenuItem.Name = "DayDateToolStripMenuItem";
+      DayDateToolStripMenuItem.Size = new Size(193, 22);
+      DayDateToolStripMenuItem.Text = "Lundi";
+      // 
+      // toolStripSeparator1
+      // 
+      toolStripSeparator1.Name = "toolStripSeparator1";
+      toolStripSeparator1.Size = new Size(190, 6);
+      // 
+      // DayHalfOffToolStripMenuItem
+      // 
+      DayHalfOffToolStripMenuItem.Name = "DayHalfOffToolStripMenuItem";
+      DayHalfOffToolStripMenuItem.Size = new Size(193, 22);
+      DayHalfOffToolStripMenuItem.Text = "Demi-journée chomée";
+      DayHalfOffToolStripMenuItem.Click += DayOffToolStripMenuItem_Click;
+      // 
+      // DayOffToolStripMenuItem
+      // 
+      DayOffToolStripMenuItem.Name = "DayOffToolStripMenuItem";
+      DayOffToolStripMenuItem.Size = new Size(193, 22);
+      DayOffToolStripMenuItem.Text = "Journée chomée";
+      DayOffToolStripMenuItem.Click += DayOffToolStripMenuItem_Click;
       // 
       // ClockInOutButton
       // 
@@ -225,7 +265,7 @@
       DetailsButton.FlatAppearance.BorderColor = Color.FromArgb(42, 58, 76);
       DetailsButton.FlatStyle = FlatStyle.Flat;
       DetailsButton.ForeColor = Color.White;
-      DetailsButton.Image = Properties.Resources.details;
+      DetailsButton.Image = Properties.Resources.table_details;
       DetailsButton.Location = new Point(0, 60);
       DetailsButton.Name = "DetailsButton";
       DetailsButton.Size = new Size(30, 30);
@@ -284,9 +324,11 @@
       Icon = (Icon)resources.GetObject("$this.Icon");
       MaximizeBox = false;
       Name = "MainForm";
+      ShowIcon = false;
       FormClosing += MainForm_FormClosing;
       Load += MainForm_Load;
       ((System.ComponentModel.ISupportInitialize)ChartPictureBox).EndInit();
+      DayContextMenuStrip.ResumeLayout(false);
       TopPanel.ResumeLayout(false);
       TopTableLayoutPanel.ResumeLayout(false);
       TopTableLayoutPanel.PerformLayout();
@@ -316,5 +358,10 @@
     private Button OptionsButton;
     private Panel MarginPanel;
     private Button DetailsButton;
+    private ContextMenuStrip DayContextMenuStrip;
+    private ToolStripMenuItem DayDateToolStripMenuItem;
+    private ToolStripSeparator toolStripSeparator1;
+    private ToolStripMenuItem DayHalfOffToolStripMenuItem;
+    private ToolStripMenuItem DayOffToolStripMenuItem;
   }
 }

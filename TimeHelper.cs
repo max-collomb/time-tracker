@@ -1,21 +1,31 @@
 ﻿using System.Text.RegularExpressions;
+using System.Windows.Annotations;
 
 namespace time_tracker
 {
   public class Day
   {
+    public static int WeekLoad = 2100; // 35h par défaut
     public DateTime Date { get; set; }
     public string SqlDate { get; set; }
     public List<Event> Checks { get; set; }
+    public Annotation? Annotation { get; set; }
     public bool IsInProgress { get; set; }
     public int TimeChecked { get; set; }
-    public Day(DateTime dateTime, List<Event>? checks = null)
+    public int TimeOff {  get; set; }
+    public Day(DateTime dateTime, List<Event>? checks = null, Annotation? annotation = null)
     {
       Date = dateTime.Date;
       SqlDate = dateTime.Date.ToString("yyyy-MM-dd");
       Checks = checks ?? DataBase.GetEvents("usr_check", SqlDate);
+      Annotation = annotation ?? DataBase.GetAnnotation(SqlDate);
       IsInProgress = SqlDate == DateTime.Now.Date.ToString("yyyy-MM-dd") && Checks.Count % 2 == 1;
       TimeChecked = Checks.Count > 0 ? ChecksToTimes() : 0;
+      TimeOff = 0;
+      if (Annotation?.Type == "half_day_off")
+        TimeOff = WeekLoad / 10;
+      if (Annotation?.Type == "day_off")
+        TimeOff = WeekLoad / 5;
     }
     private int ChecksToTimes()
     {
