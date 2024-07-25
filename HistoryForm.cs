@@ -20,6 +20,7 @@ namespace time_tracker
       { "sess_lock", "Verrouillage session" },
       { "sess_unlock", "Déverrouillage session" },
     };
+
     public HistoryForm()
     {
       InitializeComponent();
@@ -30,9 +31,8 @@ namespace time_tracker
     {
       EventsDataGridView.Rows.Clear();
       List<Event> events = DataBase.GetEvents(null, FromDatePicker.Value.ToString("yyyy-MM-dd"), ToDatePicker.Value.ToString("yyyy-MM-dd"));
-      for (int i = 0, length = events.Count; i < length; i++)
+      foreach (Event e in events)
       {
-        Event e = events[i];
         //EventsDataGridView.Rows.Add(new string[] { e.Id.ToString(), e.Date, e.Time, e.Type });
         EventsDataGridView.Rows.Insert(0, [
           e.Id.ToString("000000"),
@@ -42,11 +42,33 @@ namespace time_tracker
       }
     }
 
+    public void RefreshDaysOffDataGridView()
+    {
+      DaysOffDataGridView.Rows.Clear();
+      List<Annotation> annotations = DataBase.GetAnnotations();
+      foreach (Annotation annotation in annotations)
+      {
+        DaysOffDataGridView.Rows.Insert(0, [
+          annotation.Id,
+          annotation.Date,
+          annotation.Type == "day_off" ? "Journée chomée" : (annotation.Type == "half_day_off" ? "Demi-journée chomée" : annotation.Type),
+          annotation.Description,
+        ]);
+      }
+    }
+
     public void RefreshWeekDataGridView()
     {
       WeekDataGridView.Rows.Clear();
       List<Event> events = DataBase.GetEvents("usr_check");
+      List<Annotation> annotations = DataBase.GetAnnotations();
+      Dictionary<string, Annotation> annotationsByDate = new();
+      foreach (Annotation annotation in annotations)
+      {
+        annotationsByDate.Add(annotation.Date, annotation);
+      }
       Dictionary<string, int> timeByDate = new();
+      Dictionary<string, int> timeOffByDate = new();
       List<Event> dateEvents = new();
       for (int i = 0, length = events.Count; i < length; i++)
       {
@@ -56,8 +78,13 @@ namespace time_tracker
         {
           if (dateEvents.Count > 0)
           {
-            Day day = new(DateTime.ParseExact(e.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture), dateEvents);
+            Day day = new(
+              DateTime.ParseExact(e.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+              dateEvents,
+              annotationsByDate.ContainsKey(e.Date) ? annotationsByDate[e.Date] : null
+            );
             timeByDate.Add(e.Date, day.TimeChecked);
+            timeOffByDate.Add(e.Date, day.TimeOff);
             dateEvents.Clear();
           }
         }
@@ -71,11 +98,14 @@ namespace time_tracker
         while (currentMonday <= endDate)
         {
           int timeChecked = 0;
+          int timeOff = 0;
           for (int i = 0; i < 5; i++)
           {
             string dayOfWeek = currentMonday.AddDays(i).Date.ToString("yyyy-MM-dd");
             if (timeByDate.ContainsKey(dayOfWeek))
               timeChecked += timeByDate[dayOfWeek];
+            if (timeOffByDate.ContainsKey(dayOfWeek))
+              timeOff += timeOffByDate[dayOfWeek];
           }
           //WeekDataGridView.Rows.Add(new string[] {
           //  ISOWeek.GetWeekOfYear(currentMonday).ToString(),
@@ -85,7 +115,9 @@ namespace time_tracker
           WeekDataGridView.Rows.Insert(0, [
             currentMonday.Date.ToString("yy") + "_" + ISOWeek.GetWeekOfYear(currentMonday).ToString("00"),
             currentMonday.ToString("yyyy-MM-dd"),
-            TimeHelper.MinToHourMinStr(timeChecked)
+            TimeHelper.MinToHourMinStr(timeChecked),
+            timeOff == 0 ? "" : TimeHelper.MinToHourMinStr(timeOff),
+            TimeHelper.MinToHourMinStr(timeChecked + timeOff)
           ]);
           currentMonday = currentMonday.AddDays(7).Date;
         }
@@ -125,7 +157,7 @@ namespace time_tracker
           row.Cells[2].Value.ToString() ?? "",
           row.Cells[3].Value.ToString() ?? ""
         );
-        if (evt.Type == "usr_check")
+        if (evt.Type.EndsWith(" (usr_check)"))
         {
           using (var eventForm = new EventForm(evt.Date, evt.Time, true))
           {
@@ -148,7 +180,7 @@ namespace time_tracker
         {
           EventsDataGridView.ClearSelection();
           EventsDataGridView.Rows[rowSelected].Selected = true;
-          EditToolStripMenuItem.Enabled = EventsDataGridView.Rows[e.RowIndex].Cells[3].Value.ToString().Contains(" (usr_check)");
+          EditToolStripMenuItem.Enabled = ((string)EventsDataGridView.Rows[e.RowIndex].Cells[3].Value).EndsWith(" (usr_check)");
         }
       }
     }
@@ -171,6 +203,10 @@ namespace time_tracker
     {
       if (TabControl.SelectedIndex == 1)
       {
+        RefreshDaysOffDataGridView();
+      }
+      else if (TabControl.SelectedIndex == 2)
+      {
         RefreshWeekDataGridView();
       }
     }
@@ -188,21 +224,11 @@ namespace time_tracker
 
     private void LogLinkLabel_Click(object sender, EventArgs e)
     {
-      //using Process fileopener = new Process();
-
-      //fileopener.StartInfo.FileName = "notepad";
-      //fileopener.StartInfo.Arguments = "\"" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"time-tracker-{DateTime.Now.Year}.log") + "\"";
-      //fileopener.Start();
       Process.Start("notepad.exe", "\"" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"time-tracker-{DateTime.Now.Year}.log") + "\"");
     }
 
     private void SqliteLinkLabel_Click(object sender, EventArgs e)
     {
-      //using Process fileopener = new Process();
-
-      //fileopener.StartInfo.FileName = "explorer";
-      //fileopener.StartInfo.Arguments = "/select \"" + Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName) + "\"";
-      //fileopener.Start();
       Process.Start("explorer.exe", "/select, \"" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName) + "\"");
     }
 
@@ -210,12 +236,15 @@ namespace time_tracker
     {
       if (EventsDataGridView.SelectedRows.Count > 0)
       {
-        EditToolStripMenuItem.Enabled = EventsDataGridView.SelectedRows[0].Cells[3].Value.ToString().Contains(" (usr_check)");
+        bool isEditable = ((string)EventsDataGridView.SelectedRows[0].Cells[3].Value).EndsWith(" (usr_check)");
+        EditToolStripMenuItem.Enabled = isEditable;
+        EditEventToolStripButton.Enabled = isEditable;
         DeleteToolStripMenuItem.Enabled = true;
       }
       else
       {
         EditToolStripMenuItem.Enabled = false;
+        EditEventToolStripButton.Enabled = false;
         DeleteToolStripMenuItem.Enabled = false;
       }
     }
@@ -278,6 +307,42 @@ namespace time_tracker
         RefreshEventDataGridView();
       }
       catch { }
+    }
+
+    private void EventsDataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+    {
+      if (e.CellStyle != null && e.Value != null)
+        if (e.ColumnIndex == 3)
+        {
+          if (((string)e.Value).EndsWith(" (usr_check)"))
+            e.CellStyle.BackColor = Color.LightGreen;
+          else if (((string)e.Value).Contains(" (sys_") || ((string)e.Value).EndsWith(" (app_start)"))
+            e.CellStyle.BackColor = Color.LightSalmon;
+          else if (((string)e.Value).Contains(" (sess_"))
+            e.CellStyle.BackColor = Color.LightYellow;
+        }
+        else if (e.ColumnIndex == 1)
+        {
+          //e.Value;
+          try
+          {
+            DayOfWeek dow = DateTime.ParseExact((string)e.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture).DayOfWeek;
+            switch (dow)
+            {
+              case DayOfWeek.Monday:
+                e.CellStyle.BackColor = Color.FromArgb(214, 207, 199); break;
+              case DayOfWeek.Tuesday:
+                e.CellStyle.BackColor = Color.FromArgb(190, 189, 184); break;
+              case DayOfWeek.Wednesday:
+                e.CellStyle.BackColor = Color.FromArgb(217, 221, 220); break;
+              case DayOfWeek.Thursday:
+                e.CellStyle.BackColor = Color.FromArgb(185, 187, 182); break;
+              case DayOfWeek.Friday:
+                e.CellStyle.BackColor = Color.FromArgb(199, 198, 193); break;
+            }
+          }
+          catch { }
+        }
     }
   }
 }

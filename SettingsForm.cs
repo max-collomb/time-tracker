@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace time_tracker
 {
@@ -37,6 +38,16 @@ namespace time_tracker
         else
           rkApp.DeleteValue("TimeTracker", false);
 #endif
+    }
+
+    private void AutoReminderCheckBox_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void GithubLinkLabel_Click(object sender, EventArgs e)
+    {
+      Process.Start(new ProcessStartInfo { FileName = "https://github.com/max-collomb/time-tracker", UseShellExecute = true });
     }
   }
 }

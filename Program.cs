@@ -9,7 +9,7 @@ namespace time_tracker
     static public readonly string DbFileName = "time-tracker-debug.sqlite";
 #else
     static readonly Mutex Mutex = new(true, "{75053982-82ae-454d-9019-1355a1042fa9}");
-    static readonly string DbFileName = "time-tracker.sqlite";
+    static public readonly string DbFileName = "time-tracker.sqlite";
 #endif
     /// <summary>
     ///  The main entry point for the application.

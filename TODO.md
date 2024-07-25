@@ -1,4 +1,4 @@
-Pour 1ere release :
+v0.1 :
 [x] Raccourci badgeage dans barre des tâches
 [x] Recharger les settings après fermeture de la fenêtre d'options
 [x] fenêtre historique : repasser les boutons en thème clair
@@ -31,12 +31,18 @@ Pour 1ere release :
 [x] lien pointant vers le fichier sqlite à côté du lien des logs
 [x] Edition de l'heure d'un événement : utiliser un MaskedText plutôt qu'un DateTimePicker
 [x] créer automatiquement les annotations pour les jours fériés de l'année au premier lancement de l'année
-[ ] Détecter une nouvelle journée sans planter ;)
-[ ] nouvel onglet dans HistoryForm avec la liste des jours chomés + ajout / édition / suppression
-[ ] HistoryForm, onglet semaine : prendre en compte les (demi-)journées chomées (3 colonnes - temps travaillé - temps chomé - temps total ?)
+[x] Détecter une nouvelle journée sans planter ;)
+[x] SettingsForm : ajouter un lien GitHub
+[x] HistoryForm, onglet événements : faire fonctionner les boutons de la barre d'outils (+ désactiver "Modifier" selon la ligne sélectionnée)
+[x] HistoryForm, onglet événements : couleur conditionelle selon le type d'événement + selon la date (pour voir le changement de jour)
+[x] HistoryForm, onglet semaine : prendre en compte les (demi-)journées chomées (3 colonnes - temps travaillé - temps chomé - temps total ?)
+[ ] nouvel onglet dans HistoryForm avec la liste des jours chomés
+[ ] HistoryForm : ajout de (demi-)journées chomées
+[ ] HistoryForm : édition de (demi-)journées chomées
+[ ] HistoryForm : suppression de (demi-)journées chomées
 [ ] Si démarrage appli ou nouvelle journée détectée => compter le nombre de badgeage sur la journée précédente => si impair, ajouter automatiquement un event à 18h et afficher un messagebox
 
-Pour 2ème release :
+v1.0 :
 [ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\
 [ ] Définir des rappels (son + icone clignotante dans barre des tâches)
 [ ] Définir des rappels automatiques après chaque badgeage

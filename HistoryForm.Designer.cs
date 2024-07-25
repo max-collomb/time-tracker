@@ -63,10 +63,22 @@
       toolStripSeparator7 = new ToolStripSeparator();
       ThisYearToolStripMenuItem = new ToolStripMenuItem();
       LastYearToolStripMenuItem = new ToolStripMenuItem();
+      DaysOffTabPage = new TabPage();
+      DaysOffDataGridView = new DataGridView();
+      AnnotationId = new DataGridViewTextBoxColumn();
+      AnnotationDate = new DataGridViewTextBoxColumn();
+      AnnotationType = new DataGridViewTextBoxColumn();
+      AnnotationDescription = new DataGridViewTextBoxColumn();
+      AnnotationToolStrip = new ToolStrip();
+      AddAnnotationToolStripButton = new ToolStripButton();
+      EditAnnotationToolStripButton = new ToolStripButton();
+      DeleteAnnotationToolStripButton = new ToolStripButton();
       WeeklySummaryTabPage = new TabPage();
       WeekDataGridView = new DataGridView();
       WeekNumber = new DataGridViewTextBoxColumn();
       DateStart = new DataGridViewTextBoxColumn();
+      CheckedTime = new DataGridViewTextBoxColumn();
+      OffTime = new DataGridViewTextBoxColumn();
       TotalTime = new DataGridViewTextBoxColumn();
       ajourdhuiToolStripMenuItem = new ToolStripMenuItem();
       BottomPanel = new Panel();
@@ -79,6 +91,9 @@
       RawEventsTabPage.SuspendLayout();
       TopPanel.SuspendLayout();
       EventToolStrip.SuspendLayout();
+      DaysOffTabPage.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)DaysOffDataGridView).BeginInit();
+      AnnotationToolStrip.SuspendLayout();
       WeeklySummaryTabPage.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)WeekDataGridView).BeginInit();
       BottomPanel.SuspendLayout();
@@ -106,6 +121,7 @@
       EventsDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
       EventsDataGridView.Size = new Size(550, 486);
       EventsDataGridView.TabIndex = 1;
+      EventsDataGridView.CellFormatting += EventsDataGridView_CellFormatting;
       EventsDataGridView.CellMouseDown += EventsDataGridView_CellMouseDown;
       EventsDataGridView.SelectionChanged += EventsDataGridView_SelectionChanged;
       // 
@@ -161,6 +177,7 @@
       // TabControl
       // 
       TabControl.Controls.Add(RawEventsTabPage);
+      TabControl.Controls.Add(DaysOffTabPage);
       TabControl.Controls.Add(WeeklySummaryTabPage);
       TabControl.Dock = DockStyle.Fill;
       TabControl.Location = new Point(0, 0);
@@ -312,8 +329,8 @@
       ToolStripDropDownButton.DropDownItems.AddRange(new ToolStripItem[] { ThisDayToolStripMenuItem, LastDayToolStripMenuItem, toolStripSeparator5, ThisWeekToolStripMenuItem, LastWeekToolStripMenuItem, toolStripSeparator6, ThisMonthToolStripMenuItem, LastMonthToolStripMenuItem, toolStripSeparator7, ThisYearToolStripMenuItem, LastYearToolStripMenuItem });
       ToolStripDropDownButton.ImageTransparentColor = Color.Magenta;
       ToolStripDropDownButton.Name = "ToolStripDropDownButton";
-      ToolStripDropDownButton.Size = new Size(126, 22);
-      ToolStripDropDownButton.Text = "Périodes prédéfinies";
+      ToolStripDropDownButton.Size = new Size(60, 22);
+      ToolStripDropDownButton.Text = "Période";
       // 
       // ThisDayToolStripMenuItem
       // 
@@ -386,6 +403,94 @@
       LastYearToolStripMenuItem.Text = "L'année dernière";
       LastYearToolStripMenuItem.Click += SelectRangeToolStripMenuItem_Click;
       // 
+      // DaysOffTabPage
+      // 
+      DaysOffTabPage.Controls.Add(DaysOffDataGridView);
+      DaysOffTabPage.Controls.Add(AnnotationToolStrip);
+      DaysOffTabPage.Location = new Point(4, 24);
+      DaysOffTabPage.Name = "DaysOffTabPage";
+      DaysOffTabPage.Padding = new Padding(3);
+      DaysOffTabPage.Size = new Size(556, 560);
+      DaysOffTabPage.TabIndex = 2;
+      DaysOffTabPage.Text = "Jours chomés";
+      DaysOffTabPage.UseVisualStyleBackColor = true;
+      // 
+      // DaysOffDataGridView
+      // 
+      DaysOffDataGridView.AllowUserToAddRows = false;
+      DaysOffDataGridView.AllowUserToDeleteRows = false;
+      DaysOffDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      DaysOffDataGridView.Columns.AddRange(new DataGridViewColumn[] { AnnotationId, AnnotationDate, AnnotationType, AnnotationDescription });
+      DaysOffDataGridView.Dock = DockStyle.Fill;
+      DaysOffDataGridView.Location = new Point(3, 28);
+      DaysOffDataGridView.Name = "DaysOffDataGridView";
+      DaysOffDataGridView.ReadOnly = true;
+      DaysOffDataGridView.RowHeadersVisible = false;
+      DaysOffDataGridView.Size = new Size(550, 529);
+      DaysOffDataGridView.TabIndex = 1;
+      // 
+      // AnnotationId
+      // 
+      AnnotationId.HeaderText = "Id";
+      AnnotationId.Name = "AnnotationId";
+      AnnotationId.ReadOnly = true;
+      AnnotationId.Width = 50;
+      // 
+      // AnnotationDate
+      // 
+      AnnotationDate.HeaderText = "Date";
+      AnnotationDate.Name = "AnnotationDate";
+      AnnotationDate.ReadOnly = true;
+      AnnotationDate.Width = 75;
+      // 
+      // AnnotationType
+      // 
+      AnnotationType.HeaderText = "Type";
+      AnnotationType.Name = "AnnotationType";
+      AnnotationType.ReadOnly = true;
+      AnnotationType.Width = 150;
+      // 
+      // AnnotationDescription
+      // 
+      AnnotationDescription.HeaderText = "Description";
+      AnnotationDescription.Name = "AnnotationDescription";
+      AnnotationDescription.ReadOnly = true;
+      AnnotationDescription.Width = 150;
+      // 
+      // AnnotationToolStrip
+      // 
+      AnnotationToolStrip.GripStyle = ToolStripGripStyle.Hidden;
+      AnnotationToolStrip.Items.AddRange(new ToolStripItem[] { AddAnnotationToolStripButton, EditAnnotationToolStripButton, DeleteAnnotationToolStripButton });
+      AnnotationToolStrip.Location = new Point(3, 3);
+      AnnotationToolStrip.Name = "AnnotationToolStrip";
+      AnnotationToolStrip.Size = new Size(550, 25);
+      AnnotationToolStrip.TabIndex = 0;
+      AnnotationToolStrip.Text = "toolStrip1";
+      // 
+      // AddAnnotationToolStripButton
+      // 
+      AddAnnotationToolStripButton.Image = Properties.Resources.add;
+      AddAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
+      AddAnnotationToolStripButton.Name = "AddAnnotationToolStripButton";
+      AddAnnotationToolStripButton.Size = new Size(66, 22);
+      AddAnnotationToolStripButton.Text = "Ajouter";
+      // 
+      // EditAnnotationToolStripButton
+      // 
+      EditAnnotationToolStripButton.Image = Properties.Resources.edit;
+      EditAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
+      EditAnnotationToolStripButton.Name = "EditAnnotationToolStripButton";
+      EditAnnotationToolStripButton.Size = new Size(72, 22);
+      EditAnnotationToolStripButton.Text = "Modifier";
+      // 
+      // DeleteAnnotationToolStripButton
+      // 
+      DeleteAnnotationToolStripButton.Image = Properties.Resources.delete;
+      DeleteAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
+      DeleteAnnotationToolStripButton.Name = "DeleteAnnotationToolStripButton";
+      DeleteAnnotationToolStripButton.Size = new Size(82, 22);
+      DeleteAnnotationToolStripButton.Text = "Supprimer";
+      // 
       // WeeklySummaryTabPage
       // 
       WeeklySummaryTabPage.Controls.Add(WeekDataGridView);
@@ -406,7 +511,7 @@
       WeekDataGridView.BackgroundColor = SystemColors.Control;
       WeekDataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
       WeekDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      WeekDataGridView.Columns.AddRange(new DataGridViewColumn[] { WeekNumber, DateStart, TotalTime });
+      WeekDataGridView.Columns.AddRange(new DataGridViewColumn[] { WeekNumber, DateStart, CheckedTime, OffTime, TotalTime });
       WeekDataGridView.Dock = DockStyle.Fill;
       WeekDataGridView.Location = new Point(3, 3);
       WeekDataGridView.MultiSelect = false;
@@ -433,11 +538,26 @@
       DateStart.ReadOnly = true;
       DateStart.Width = 75;
       // 
+      // CheckedTime
+      // 
+      CheckedTime.HeaderText = "Temps badgé";
+      CheckedTime.Name = "CheckedTime";
+      CheckedTime.ReadOnly = true;
+      CheckedTime.Width = 125;
+      // 
+      // OffTime
+      // 
+      OffTime.HeaderText = "Temps chomé";
+      OffTime.Name = "OffTime";
+      OffTime.ReadOnly = true;
+      OffTime.Width = 125;
+      // 
       // TotalTime
       // 
       TotalTime.HeaderText = "Temps total";
       TotalTime.Name = "TotalTime";
       TotalTime.ReadOnly = true;
+      TotalTime.Width = 125;
       // 
       // ajourdhuiToolStripMenuItem
       // 
@@ -514,6 +634,11 @@
       TopPanel.PerformLayout();
       EventToolStrip.ResumeLayout(false);
       EventToolStrip.PerformLayout();
+      DaysOffTabPage.ResumeLayout(false);
+      DaysOffTabPage.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)DaysOffDataGridView).EndInit();
+      AnnotationToolStrip.ResumeLayout(false);
+      AnnotationToolStrip.PerformLayout();
       WeeklySummaryTabPage.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)WeekDataGridView).EndInit();
       BottomPanel.ResumeLayout(false);
@@ -548,9 +673,6 @@
     private ToolStripMenuItem ThisYearToolStripMenuItem;
     private ToolStripMenuItem LastYearToolStripMenuItem;
     private LinkLabel LogLinkLabel;
-    private DataGridViewTextBoxColumn WeekNumber;
-    private DataGridViewTextBoxColumn DateStart;
-    private DataGridViewTextBoxColumn TotalTime;
     private ToolStrip EventToolStrip;
     private ToolStripButton AddEventToolStripButton;
     private ToolStripButton EditEventToolStripButton;
@@ -566,5 +688,20 @@
     private DataGridViewTextBoxColumn Time;
     private DataGridViewTextBoxColumn Type;
     private LinkLabel SqliteLinkLabel;
+    private DataGridViewTextBoxColumn WeekNumber;
+    private DataGridViewTextBoxColumn DateStart;
+    private DataGridViewTextBoxColumn CheckedTime;
+    private DataGridViewTextBoxColumn OffTime;
+    private DataGridViewTextBoxColumn TotalTime;
+    private TabPage DaysOffTabPage;
+    private ToolStrip AnnotationToolStrip;
+    private ToolStripButton AddAnnotationToolStripButton;
+    private ToolStripButton EditAnnotationToolStripButton;
+    private ToolStripButton DeleteAnnotationToolStripButton;
+    private DataGridView DaysOffDataGridView;
+    private DataGridViewTextBoxColumn AnnotationId;
+    private DataGridViewTextBoxColumn AnnotationDate;
+    private DataGridViewTextBoxColumn AnnotationType;
+    private DataGridViewTextBoxColumn AnnotationDescription;
   }
 }

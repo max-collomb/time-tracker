@@ -57,8 +57,10 @@
       CancelFormButton = new Button();
       MarginPanel = new Panel();
       SaveButton = new Button();
-      ProductNameLabel = new Label();
       AutoStartCheckBox = new CheckBox();
+      tableLayoutPanel1 = new TableLayoutPanel();
+      ProductNameLabel = new Label();
+      GithubLinkLabel = new LinkLabel();
       TimeTableLayoutPanel.SuspendLayout();
       PauseTableLayoutPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)MondayPauseUpDown).BeginInit();
@@ -67,6 +69,7 @@
       ((System.ComponentModel.ISupportInitialize)ThursdayPauseUpDown).BeginInit();
       ((System.ComponentModel.ISupportInitialize)FridayPauseUpDown).BeginInit();
       BottomPanel.SuspendLayout();
+      tableLayoutPanel1.SuspendLayout();
       SuspendLayout();
       // 
       // TimeSectionLabel
@@ -409,6 +412,7 @@
       AutoReminderCheckBox.Text = "Activer automatiquement les rappels";
       AutoReminderCheckBox.UseVisualStyleBackColor = true;
       AutoReminderCheckBox.Visible = false;
+      AutoReminderCheckBox.Click += AutoReminderCheckBox_Click;
       // 
       // BottomPanel
       // 
@@ -458,18 +462,6 @@
       SaveButton.UseVisualStyleBackColor = true;
       SaveButton.Click += SaveButton_Click;
       // 
-      // ProductNameLabel
-      // 
-      ProductNameLabel.Dock = DockStyle.Bottom;
-      ProductNameLabel.ForeColor = Color.DimGray;
-      ProductNameLabel.Location = new Point(10, 260);
-      ProductNameLabel.Name = "ProductNameLabel";
-      ProductNameLabel.Padding = new Padding(0, 0, 0, 10);
-      ProductNameLabel.Size = new Size(336, 25);
-      ProductNameLabel.TabIndex = 6;
-      ProductNameLabel.Text = "Time Tracker v0.1";
-      ProductNameLabel.TextAlign = ContentAlignment.TopRight;
-      // 
       // AutoStartCheckBox
       // 
       AutoStartCheckBox.AutoSize = true;
@@ -484,15 +476,58 @@
       AutoStartCheckBox.Text = "Démarrer avec windows";
       AutoStartCheckBox.UseVisualStyleBackColor = true;
       // 
+      // tableLayoutPanel1
+      // 
+      tableLayoutPanel1.ColumnCount = 2;
+      tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+      tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+      tableLayoutPanel1.Controls.Add(ProductNameLabel, 1, 0);
+      tableLayoutPanel1.Controls.Add(GithubLinkLabel, 0, 0);
+      tableLayoutPanel1.Dock = DockStyle.Bottom;
+      tableLayoutPanel1.Location = new Point(10, 260);
+      tableLayoutPanel1.Name = "tableLayoutPanel1";
+      tableLayoutPanel1.RowCount = 1;
+      tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+      tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+      tableLayoutPanel1.Size = new Size(336, 25);
+      tableLayoutPanel1.TabIndex = 8;
+      // 
+      // ProductNameLabel
+      // 
+      ProductNameLabel.Dock = DockStyle.Fill;
+      ProductNameLabel.ForeColor = Color.DimGray;
+      ProductNameLabel.Location = new Point(168, 0);
+      ProductNameLabel.Margin = new Padding(0);
+      ProductNameLabel.Name = "ProductNameLabel";
+      ProductNameLabel.Padding = new Padding(0, 0, 0, 10);
+      ProductNameLabel.Size = new Size(168, 25);
+      ProductNameLabel.TabIndex = 7;
+      ProductNameLabel.Text = "Time Tracker v0.1";
+      ProductNameLabel.TextAlign = ContentAlignment.TopRight;
+      // 
+      // GithubLinkLabel
+      // 
+      GithubLinkLabel.AutoSize = true;
+      GithubLinkLabel.Dock = DockStyle.Fill;
+      GithubLinkLabel.LinkColor = Color.SkyBlue;
+      GithubLinkLabel.Location = new Point(0, 0);
+      GithubLinkLabel.Margin = new Padding(0);
+      GithubLinkLabel.Name = "GithubLinkLabel";
+      GithubLinkLabel.Size = new Size(168, 25);
+      GithubLinkLabel.TabIndex = 8;
+      GithubLinkLabel.TabStop = true;
+      GithubLinkLabel.Text = "GitHub";
+      GithubLinkLabel.Click += GithubLinkLabel_Click;
+      // 
       // SettingsForm
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.FromArgb(34, 34, 34);
       ClientSize = new Size(356, 325);
+      Controls.Add(tableLayoutPanel1);
       Controls.Add(AutoReminderCheckBox);
       Controls.Add(AutoStartCheckBox);
-      Controls.Add(ProductNameLabel);
       Controls.Add(BottomPanel);
       Controls.Add(PauseTableLayoutPanel);
       Controls.Add(PauseSectionLabel);
@@ -515,6 +550,8 @@
       ((System.ComponentModel.ISupportInitialize)ThursdayPauseUpDown).EndInit();
       ((System.ComponentModel.ISupportInitialize)FridayPauseUpDown).EndInit();
       BottomPanel.ResumeLayout(false);
+      tableLayoutPanel1.ResumeLayout(false);
+      tableLayoutPanel1.PerformLayout();
       ResumeLayout(false);
       PerformLayout();
     }
@@ -542,7 +579,6 @@
     private Label PauseSectionLabel;
     private CheckBox AutoReminderCheckBox;
     private Panel BottomPanel;
-    private Label ProductNameLabel;
     private Button CancelFormButton;
     private Panel MarginPanel;
     private Button SaveButton;
@@ -552,5 +588,8 @@
     private MaskedTextBox TuesdayMaskedTextBox;
     private MaskedTextBox MondayMaskedTextBox;
     private CheckBox AutoStartCheckBox;
+    private TableLayoutPanel tableLayoutPanel1;
+    private Label ProductNameLabel;
+    private LinkLabel GithubLinkLabel;
   }
 }
