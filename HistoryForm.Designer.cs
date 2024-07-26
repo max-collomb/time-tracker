@@ -69,6 +69,9 @@
       AnnotationDate = new DataGridViewTextBoxColumn();
       AnnotationType = new DataGridViewTextBoxColumn();
       AnnotationDescription = new DataGridViewTextBoxColumn();
+      AnnotationContextMenuStrip = new ContextMenuStrip(components);
+      EditAnnotationToolStripMenuItem = new ToolStripMenuItem();
+      DeleteAnnotationToolStripMenuItem = new ToolStripMenuItem();
       AnnotationToolStrip = new ToolStrip();
       AddAnnotationToolStripButton = new ToolStripButton();
       EditAnnotationToolStripButton = new ToolStripButton();
@@ -93,6 +96,7 @@
       EventToolStrip.SuspendLayout();
       DaysOffTabPage.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)DaysOffDataGridView).BeginInit();
+      AnnotationContextMenuStrip.SuspendLayout();
       AnnotationToolStrip.SuspendLayout();
       WeeklySummaryTabPage.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)WeekDataGridView).BeginInit();
@@ -412,7 +416,7 @@
       DaysOffTabPage.Padding = new Padding(3);
       DaysOffTabPage.Size = new Size(556, 560);
       DaysOffTabPage.TabIndex = 2;
-      DaysOffTabPage.Text = "Jours chomés";
+      DaysOffTabPage.Text = "Jours chômés";
       DaysOffTabPage.UseVisualStyleBackColor = true;
       // 
       // DaysOffDataGridView
@@ -426,8 +430,11 @@
       DaysOffDataGridView.Name = "DaysOffDataGridView";
       DaysOffDataGridView.ReadOnly = true;
       DaysOffDataGridView.RowHeadersVisible = false;
+      DaysOffDataGridView.RowTemplate.ContextMenuStrip = AnnotationContextMenuStrip;
+      DaysOffDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
       DaysOffDataGridView.Size = new Size(550, 529);
       DaysOffDataGridView.TabIndex = 1;
+      DaysOffDataGridView.CellMouseDown += DaysOffDataGridView_CellMouseDown;
       // 
       // AnnotationId
       // 
@@ -457,6 +464,26 @@
       AnnotationDescription.ReadOnly = true;
       AnnotationDescription.Width = 150;
       // 
+      // AnnotationContextMenuStrip
+      // 
+      AnnotationContextMenuStrip.Items.AddRange(new ToolStripItem[] { EditAnnotationToolStripMenuItem, DeleteAnnotationToolStripMenuItem });
+      AnnotationContextMenuStrip.Name = "AnnotationContextMenuStrip";
+      AnnotationContextMenuStrip.Size = new Size(130, 48);
+      // 
+      // EditAnnotationToolStripMenuItem
+      // 
+      EditAnnotationToolStripMenuItem.Name = "EditAnnotationToolStripMenuItem";
+      EditAnnotationToolStripMenuItem.Size = new Size(129, 22);
+      EditAnnotationToolStripMenuItem.Text = "Modifier";
+      EditAnnotationToolStripMenuItem.Click += EditAnnotationToolStripButton_Click;
+      // 
+      // DeleteAnnotationToolStripMenuItem
+      // 
+      DeleteAnnotationToolStripMenuItem.Name = "DeleteAnnotationToolStripMenuItem";
+      DeleteAnnotationToolStripMenuItem.Size = new Size(129, 22);
+      DeleteAnnotationToolStripMenuItem.Text = "Supprimer";
+      DeleteAnnotationToolStripMenuItem.Click += DeleteAnnotationToolStripButton_Click;
+      // 
       // AnnotationToolStrip
       // 
       AnnotationToolStrip.GripStyle = ToolStripGripStyle.Hidden;
@@ -474,6 +501,7 @@
       AddAnnotationToolStripButton.Name = "AddAnnotationToolStripButton";
       AddAnnotationToolStripButton.Size = new Size(66, 22);
       AddAnnotationToolStripButton.Text = "Ajouter";
+      AddAnnotationToolStripButton.Click += AddAnnotationToolStripButton_Click;
       // 
       // EditAnnotationToolStripButton
       // 
@@ -482,6 +510,7 @@
       EditAnnotationToolStripButton.Name = "EditAnnotationToolStripButton";
       EditAnnotationToolStripButton.Size = new Size(72, 22);
       EditAnnotationToolStripButton.Text = "Modifier";
+      EditAnnotationToolStripButton.Click += EditAnnotationToolStripButton_Click;
       // 
       // DeleteAnnotationToolStripButton
       // 
@@ -490,6 +519,7 @@
       DeleteAnnotationToolStripButton.Name = "DeleteAnnotationToolStripButton";
       DeleteAnnotationToolStripButton.Size = new Size(82, 22);
       DeleteAnnotationToolStripButton.Text = "Supprimer";
+      DeleteAnnotationToolStripButton.Click += DeleteAnnotationToolStripButton_Click;
       // 
       // WeeklySummaryTabPage
       // 
@@ -624,6 +654,7 @@
       Controls.Add(BottomPanel);
       Name = "HistoryForm";
       Text = "Historique";
+      FormClosing += HistoryForm_FormClosing;
       Load += HistoryForm_Load;
       ((System.ComponentModel.ISupportInitialize)EventsDataGridView).EndInit();
       EventContextMenuStrip.ResumeLayout(false);
@@ -637,6 +668,7 @@
       DaysOffTabPage.ResumeLayout(false);
       DaysOffTabPage.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)DaysOffDataGridView).EndInit();
+      AnnotationContextMenuStrip.ResumeLayout(false);
       AnnotationToolStrip.ResumeLayout(false);
       AnnotationToolStrip.PerformLayout();
       WeeklySummaryTabPage.ResumeLayout(false);
@@ -703,5 +735,8 @@
     private DataGridViewTextBoxColumn AnnotationDate;
     private DataGridViewTextBoxColumn AnnotationType;
     private DataGridViewTextBoxColumn AnnotationDescription;
+    private ContextMenuStrip AnnotationContextMenuStrip;
+    private ToolStripMenuItem EditAnnotationToolStripMenuItem;
+    private ToolStripMenuItem DeleteAnnotationToolStripMenuItem;
   }
 }

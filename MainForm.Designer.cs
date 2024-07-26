@@ -81,7 +81,7 @@
       // 
       DayContextMenuStrip.Items.AddRange(new ToolStripItem[] { DayDateToolStripMenuItem, toolStripSeparator1, DayHalfOffToolStripMenuItem, DayOffToolStripMenuItem });
       DayContextMenuStrip.Name = "DayContextMenuStrip";
-      DayContextMenuStrip.Size = new Size(194, 76);
+      DayContextMenuStrip.Size = new Size(194, 98);
       // 
       // DayDateToolStripMenuItem
       // 
@@ -99,14 +99,14 @@
       // 
       DayHalfOffToolStripMenuItem.Name = "DayHalfOffToolStripMenuItem";
       DayHalfOffToolStripMenuItem.Size = new Size(193, 22);
-      DayHalfOffToolStripMenuItem.Text = "Demi-journée chomée";
+      DayHalfOffToolStripMenuItem.Text = "Demi-journée chômée";
       DayHalfOffToolStripMenuItem.Click += DayOffToolStripMenuItem_Click;
       // 
       // DayOffToolStripMenuItem
       // 
       DayOffToolStripMenuItem.Name = "DayOffToolStripMenuItem";
       DayOffToolStripMenuItem.Size = new Size(193, 22);
-      DayOffToolStripMenuItem.Text = "Journée chomée";
+      DayOffToolStripMenuItem.Text = "Journée chômée";
       DayOffToolStripMenuItem.Click += DayOffToolStripMenuItem_Click;
       // 
       // ClockInOutButton

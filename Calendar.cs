@@ -111,7 +111,7 @@ namespace time_tracker
       //holidays.Add(Pentecote(year));
 
       // Lundi de la Pentecôte (lundi après la Pentecôte)
-      holidays.Add("Pentecôte", PentecoteLundi(year)); //Ce n'est plus une date fériée
+      // holidays.Add("Pentecôte", PentecoteLundi(year)); //Ce n'est plus une date fériée
 
       // jour de l'an
       holidays.Add("Jour de l'an", new DateTime(year + 1, 1, 1));

@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 
 namespace time_tracker
 {
@@ -114,6 +115,20 @@ namespace time_tracker
     {
       DataBase.InsertEvent();
       RefreshTimeData();
+      if (WeekDays[TodayIdx].Checks.Count == 1) // seulement au premier badgeage du jour
+      {
+        Tuple<int, string, string> previousDayDetails = DataBase.GetPreviousDayChecks(DateTime.Now);
+        if (previousDayDetails.Item1 < 4 || previousDayDetails.Item1 % 2 == 1)
+        {
+          MessageBox.Show(
+            "Le nombre de badgeages est incorrect pour le " + DateTime.ParseExact(previousDayDetails.Item3, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("dd/MM/yyyy") + "\n" +
+            previousDayDetails.Item1.ToString() + " badgeage" + (previousDayDetails.Item1 > 1 ? "s" : "") + " : " + previousDayDetails.Item2 + "\n\n" +
+            "Corrigez la situation dans la fenêtre d'historique",
+            "Anomalie détectée",
+            MessageBoxButtons.OK
+          );
+        }
+      }
     }
 
     private void ThumbnailButton_Click(object? sender, ThumbnailButtonClickedEventArgs e)
@@ -249,6 +264,7 @@ namespace time_tracker
       Pen targetPen = new(Color.FromArgb(100, 187, 205), 1);
       Pen borderPen = new(Color.FromArgb(21, 29, 39));
       SolidBrush fillBrush = new(Color.FromArgb(37, 70, 77));
+      SolidBrush fillBrushError = new(Color.FromArgb(77, 37, 37));
       HatchBrush hatchBrush = new(HatchStyle.WideUpwardDiagonal, Color.FromArgb(37, 70, 77), BackColor);
       SolidBrush fillBrushHl = new(Color.FromArgb(100, 187, 205));
       for (int i = 0; i < 5; i++)
@@ -261,8 +277,17 @@ namespace time_tracker
         }
         if (WeekDays[i].TimeChecked > 0)
         {
+          bool hasAnomaly = (i != TodayIdx) && (WeekDays[i].Checks.Count > 0) && (WeekDays[i].Checks.Count < 4 || WeekDays[i].Checks.Count % 2 == 1);
           int doneHeight = Math.Min(barHeight * WeekDays[i].TimeChecked / maxDone, barHeight);
-          g.FillRectangle(fillBrush, new RectangleF(margin + i * barWidth + padding, labelHeight + barHeight - doneHeight - offHeight, barWidth - 2 * padding, doneHeight));
+          g.FillRectangle(
+            hasAnomaly ? fillBrushError : fillBrush,
+            new RectangleF(
+              margin + i * barWidth + padding,
+              labelHeight + barHeight - doneHeight - offHeight,
+              barWidth - 2 * padding,
+              doneHeight
+            )
+          );
         }
         g.DrawString(days[i], this.Font, i == TodayIdx ? fillBrushHl : fillBrush, margin + padding + i * barWidth, 2);
         g.DrawRectangle(borderPen, new RectangleF(margin + i * barWidth, 0, barWidth, barHeight + labelHeight));
@@ -294,6 +319,11 @@ namespace time_tracker
           tooltipContent = WeekDays[day].Date.ToString("ddd dd/MM");
           if (WeekDays[day].TimeChecked + WeekDays[day].TimeOff > 0)
             tooltipContent += "\n" + TimeHelper.MinToHourMinStr(WeekDays[day].TimeChecked + WeekDays[day].TimeOff) + " / " + TimeHelper.MinToHourMinStr(Targets[day]);
+          bool hasAnomaly = (day != TodayIdx) && (WeekDays[day].Checks.Count > 0) && (WeekDays[day].Checks.Count < 4 || WeekDays[day].Checks.Count % 2 == 1);
+          if (hasAnomaly) {
+            tooltipContent += "\n\nANOMALIE : " + WeekDays[day].Checks.Count + " badgeage" + (WeekDays[day].Checks.Count > 1 ? "s" : "") +
+              "\n(nombre pair " + char.ConvertFromUtf32(int.Parse("2265", System.Globalization.NumberStyles.HexNumber)) + " 4 attendu)";
+          }
           if (WeekDays[day].Checks.Count > 0)
           {
             tooltipContent += "\n";

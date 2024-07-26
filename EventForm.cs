@@ -46,7 +46,12 @@ namespace time_tracker
           TimeMaskedTextBox.Text = DateTime.ParseExact(TimeMaskedTextBox.Text, "HH:mm", CultureInfo.InvariantCulture)
                                            .AddMinutes(delta).ToString("HH:mm");
         }
-      catch { }
+        catch { }
+    }
+
+    private void TimeMaskedTextBox_Enter(object sender, EventArgs e)
+    {
+      BeginInvoke((Action)delegate { ((MaskedTextBox)sender).SelectAll(); });
     }
   }
 }

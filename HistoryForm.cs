@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Windows.Controls;
-using System.Windows.Forms;
 
 namespace time_tracker
 {
@@ -220,6 +218,48 @@ namespace time_tracker
         if (column.Index > 0)
           column.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
+
+      if (Properties.Settings.Default.HistoryFormPosition.X != -1 || Properties.Settings.Default.HistoryFormPosition.Y != -1)
+      {
+        Rectangle bounds = new(Properties.Settings.Default.HistoryFormPosition, Size);
+        if (Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(bounds)))
+        {
+          StartPosition = FormStartPosition.Manual;
+          DesktopLocation = Properties.Settings.Default.HistoryFormPosition;
+        }
+      }
+
+      switch (Properties.Settings.Default.HistoryFormActiveTab)
+      {
+        case "events":
+          TabControl.SelectedTab = RawEventsTabPage;
+          break;
+        case "annotations":
+          TabControl.SelectedTab = DaysOffTabPage;
+          break;
+        case "weekly_summary":
+          TabControl.SelectedTab = WeeklySummaryTabPage;
+          break;
+      }
+    }
+
+    private void HistoryForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      switch (TabControl.SelectedTab?.Name)
+      {
+        case "RawEventsTabPage":
+          Properties.Settings.Default.HistoryFormActiveTab = "events";
+          break;
+        case "DaysOffTabPage":
+          Properties.Settings.Default.HistoryFormActiveTab = "annotations";
+          break;
+        case "WeeklySummaryTabPage":
+          Properties.Settings.Default.HistoryFormActiveTab = "weekly_summary";
+          break;
+      }
+      Properties.Settings.Default.HistoryFormPosition = DesktopBounds.Location;
+      Properties.Settings.Default.Save();
+
     }
 
     private void LogLinkLabel_Click(object sender, EventArgs e)
@@ -338,11 +378,87 @@ namespace time_tracker
               case DayOfWeek.Thursday:
                 e.CellStyle.BackColor = Color.FromArgb(185, 187, 182); break;
               case DayOfWeek.Friday:
-                e.CellStyle.BackColor = Color.FromArgb(199, 198, 193); break;
+                e.CellStyle.BackColor = Color.FromArgb(208, 215, 220); break;
             }
           }
           catch { }
         }
     }
+
+    private void AnnotationToolStrip_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void AddAnnotationToolStripButton_Click(object sender, EventArgs e)
+    {
+      using var annotationForm = new AnnotationForm(DateTime.Now.Date.ToString("yyyy-MM-dd"), false, "");
+      if (annotationForm.ShowDialog(this) == DialogResult.OK)
+      {
+        Annotation? existingAnnotation = DataBase.GetAnnotation(annotationForm.Date);
+        if (existingAnnotation != null)
+        {
+          DialogResult dialogResult = MessageBox.Show("Il existe déjà une saisie pour ce jour. Remplacer la saisie existante ?", "Confirmation", MessageBoxButtons.YesNo);
+          if (dialogResult != DialogResult.Yes)
+            return;
+          DataBase.DeleteAnnotation(existingAnnotation);
+        }
+        DataBase.InsertAnnotation(annotationForm.Date, annotationForm.IsHalfDay ? "half_day_off" : "day_off", annotationForm.Description);
+        RefreshDaysOffDataGridView();
+      }
+
+    }
+
+    private void EditAnnotationToolStripButton_Click(object sender, EventArgs e)
+    {
+      if (DaysOffDataGridView.SelectedRows.Count == 1)
+      {
+        var row = DaysOffDataGridView.Rows[DaysOffDataGridView.SelectedRows[0].Index];
+        Annotation annotation = new(
+          Int64.Parse(row.Cells[0].Value.ToString() ?? "-1"),
+          row.Cells[1].Value.ToString() ?? "",
+          ((string)row.Cells[2].Value).Contains("Demi") ? "half_day_off" : "day_off",
+          row.Cells[3].Value.ToString() ?? ""
+        );
+        using (var annotationForm = new AnnotationForm(annotation.Date, annotation.Type == "half_day_off", annotation.Description))
+        {
+          if (annotationForm.ShowDialog(this) == DialogResult.OK)
+          {
+            DataBase.UpdateAnnotation(annotation, annotationForm.Date, annotationForm.IsHalfDay ? "half_day_off" : "day_off", annotationForm.Description);
+            RefreshDaysOffDataGridView();
+          }
+        }
+      }
+    }
+
+    private void DeleteAnnotationToolStripButton_Click(object sender, EventArgs e)
+    {
+      if (DaysOffDataGridView.SelectedRows.Count == 1)
+      {
+        var row = DaysOffDataGridView.Rows[DaysOffDataGridView.SelectedRows[0].Index];
+        Annotation annotation = new(
+          Int64.Parse(row.Cells[0].Value.ToString() ?? "-1"),
+          row.Cells[1].Value.ToString() ?? "",
+          ((string)row.Cells[2].Value).Contains("Demi") ? "half_day_off" : "day_off",
+          row.Cells[3].Value.ToString() ?? ""
+        );
+        DataBase.DeleteAnnotation(annotation);
+        RefreshDaysOffDataGridView();
+      }
+    }
+
+    private void DaysOffDataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        int rowSelected = e.RowIndex;
+        if (e.RowIndex != -1)
+        {
+          DaysOffDataGridView.ClearSelection();
+          DaysOffDataGridView.Rows[rowSelected].Selected = true;
+        }
+      }
+    }
+
   }
 }

@@ -118,5 +118,29 @@ namespace time_tracker.Properties {
                 this["WindowPosition"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HistoryFormActiveTab {
+            get {
+                return ((string)(this["HistoryFormActiveTab"]));
+            }
+            set {
+                this["HistoryFormActiveTab"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, -1")]
+        public global::System.Drawing.Point HistoryFormPosition {
+            get {
+                return ((global::System.Drawing.Point)(this["HistoryFormPosition"]));
+            }
+            set {
+                this["HistoryFormPosition"] = value;
+            }
+        }
     }
 }

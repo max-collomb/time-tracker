@@ -36,11 +36,12 @@ v0.1 :
 [x] HistoryForm, onglet événements : faire fonctionner les boutons de la barre d'outils (+ désactiver "Modifier" selon la ligne sélectionnée)
 [x] HistoryForm, onglet événements : couleur conditionelle selon le type d'événement + selon la date (pour voir le changement de jour)
 [x] HistoryForm, onglet semaine : prendre en compte les (demi-)journées chomées (3 colonnes - temps travaillé - temps chomé - temps total ?)
-[ ] nouvel onglet dans HistoryForm avec la liste des jours chomés
-[ ] HistoryForm : ajout de (demi-)journées chomées
-[ ] HistoryForm : édition de (demi-)journées chomées
-[ ] HistoryForm : suppression de (demi-)journées chomées
-[ ] Si démarrage appli ou nouvelle journée détectée => compter le nombre de badgeage sur la journée précédente => si impair, ajouter automatiquement un event à 18h et afficher un messagebox
+[x] nouvel onglet dans HistoryForm avec la liste des jours chomés
+[x] HistoryForm : ajout de (demi-)journées chomées
+[x] HistoryForm : édition de (demi-)journées chomées
+[x] HistoryForm : suppression de (demi-)journées chomées
+[x] sauvegarder l'onglet actif dans HistoryForm dans les Settings
+[x] Si démarrage appli ou nouvelle journée détectée => compter le nombre de badgeage sur la journée précédente => si impair, ajouter automatiquement un event à 18h et afficher un messagebox
 
 v1.0 :
 [ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\

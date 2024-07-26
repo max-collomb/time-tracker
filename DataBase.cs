@@ -58,9 +58,9 @@ namespace time_tracker
         DateTime now = DateTime.Now;
         var command = sqliteConnection.CreateCommand();
         command.CommandText = @"INSERT INTO events (date, time, type) VALUES (@date, @time, @type)";
-        command.Parameters.AddWithValue("@date", String.IsNullOrEmpty(date) ? $"{now:yyyy-MM-dd}" : date);
-        command.Parameters.AddWithValue("@time", String.IsNullOrEmpty(time) ? $"{now:HH:mm}" : time);
-        command.Parameters.AddWithValue("@type", String.IsNullOrEmpty(type) ? "usr_check" : type);
+        command.Parameters.AddWithValue("@date", string.IsNullOrEmpty(date) ? $"{now:yyyy-MM-dd}" : date);
+        command.Parameters.AddWithValue("@time", string.IsNullOrEmpty(time) ? $"{now:HH:mm}" : time);
+        command.Parameters.AddWithValue("@type", string.IsNullOrEmpty(type) ? "usr_check" : type);
         Log.Information($"INSERT INTO events (\"{command.Parameters[0].Value}\", \"{command.Parameters[1].Value}\", \"{command.Parameters[2].Value}\");");
         command.ExecuteNonQuery();
       }
@@ -104,19 +104,19 @@ namespace time_tracker
         var command = sqliteConnection.CreateCommand();
         command.CommandText = @"SELECT rowid, date, time, type FROM events";
         string cond = " WHERE";
-        if (!String.IsNullOrEmpty(type))
+        if (!string.IsNullOrEmpty(type))
         {
           command.CommandText += cond + " type = @type";
           command.Parameters.AddWithValue("@type", type);
           cond = " AND";
         }
-        if (!String.IsNullOrEmpty(date1) && !String.IsNullOrEmpty(date2))
+        if (!string.IsNullOrEmpty(date1) && !string.IsNullOrEmpty(date2))
         {
           command.CommandText += cond + " date >= @start AND date <= @end";
           command.Parameters.AddWithValue("@start", date1);
           command.Parameters.AddWithValue("@end", date2);
         }
-        else if (!String.IsNullOrEmpty(date1))
+        else if (!string.IsNullOrEmpty(date1))
         {
           command.CommandText += cond + " date = @date";
           command.Parameters.AddWithValue("@date", date1);
@@ -127,6 +127,32 @@ namespace time_tracker
           rows.Add(new Event(reader.GetInt64(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
       }
       return rows;
+    }
+
+    public static Tuple<int, string, string> GetPreviousDayChecks(DateTime date)
+    {
+      if (sqliteConnection != null)
+      {
+        var command = sqliteConnection.CreateCommand();
+        string today = date.Date.ToString("yyyy-MM-dd");
+        string lastMonth = date.AddMonths(-1).Date.ToString("yyyy-MM-dd");
+        command.CommandText = @"SELECT COUNT(rowid), GROUP_CONCAT(TIME, "" | ""), date
+          FROM events
+          WHERE TYPE = @type
+            AND date = (
+              SELECT MAX(date)
+              FROM events
+              WHERE DATE < @today
+                AND date > @lastmonth
+            )";
+        command.Parameters.AddWithValue("@type", "usr_check");
+        command.Parameters.AddWithValue("@today", today);
+        command.Parameters.AddWithValue("@lastmonth", lastMonth);
+        using var reader = command.ExecuteReader();
+        if (reader.Read())
+          return new Tuple<int, string, string>(reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+      }
+      return new Tuple<int, string, string>(0, "", "");
     }
     
     public static void InsertAnnotation(string date, string type, string? description = null)
@@ -178,7 +204,7 @@ namespace time_tracker
       {
         var command = sqliteConnection.CreateCommand();
         command.CommandText = @"SELECT rowid, date, type, description FROM annotations";
-        if (!String.IsNullOrEmpty(date1) && !String.IsNullOrEmpty(date2))
+        if (!string.IsNullOrEmpty(date1) && !string.IsNullOrEmpty(date2))
         {
           command.CommandText += " WHERE date >= @start AND date <= @end";
           command.Parameters.AddWithValue("@start", date1);
