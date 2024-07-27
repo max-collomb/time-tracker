@@ -121,6 +121,7 @@
       EventsDataGridView.ReadOnly = true;
       EventsDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
       EventsDataGridView.RowHeadersVisible = false;
+      EventsDataGridView.RowHeadersWidth = 62;
       EventsDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       EventsDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
       EventsDataGridView.Size = new Size(550, 486);
@@ -132,6 +133,7 @@
       // Id
       // 
       Id.HeaderText = "Id";
+      Id.MinimumWidth = 8;
       Id.Name = "Id";
       Id.ReadOnly = true;
       Id.Width = 45;
@@ -139,6 +141,7 @@
       // Date
       // 
       Date.HeaderText = "Date";
+      Date.MinimumWidth = 8;
       Date.Name = "Date";
       Date.ReadOnly = true;
       Date.Width = 75;
@@ -146,6 +149,7 @@
       // Time
       // 
       Time.HeaderText = "Heure";
+      Time.MinimumWidth = 8;
       Time.Name = "Time";
       Time.ReadOnly = true;
       Time.Width = 75;
@@ -153,12 +157,14 @@
       // Type
       // 
       Type.HeaderText = "Type";
+      Type.MinimumWidth = 8;
       Type.Name = "Type";
       Type.ReadOnly = true;
       Type.Width = 300;
       // 
       // EventContextMenuStrip
       // 
+      EventContextMenuStrip.ImageScalingSize = new Size(24, 24);
       EventContextMenuStrip.Items.AddRange(new ToolStripItem[] { EditToolStripMenuItem, DeleteToolStripMenuItem });
       EventContextMenuStrip.Name = "contextMenuStrip1";
       EventContextMenuStrip.RenderMode = ToolStripRenderMode.System;
@@ -288,9 +294,11 @@
       // EventToolStrip
       // 
       EventToolStrip.GripStyle = ToolStripGripStyle.Hidden;
+      EventToolStrip.ImageScalingSize = new Size(24, 24);
       EventToolStrip.Items.AddRange(new ToolStripItem[] { AddEventToolStripButton, EditEventToolStripButton, DeleteEventToolStripButton, toolStripSeparator4, ToolStripDropDownButton });
       EventToolStrip.Location = new Point(3, 3);
       EventToolStrip.Name = "EventToolStrip";
+      EventToolStrip.Padding = new Padding(0, 0, 2, 0);
       EventToolStrip.Size = new Size(550, 25);
       EventToolStrip.TabIndex = 0;
       EventToolStrip.Text = "toolStrip1";
@@ -298,6 +306,7 @@
       // AddEventToolStripButton
       // 
       AddEventToolStripButton.Image = Properties.Resources.add;
+      AddEventToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       AddEventToolStripButton.ImageTransparentColor = Color.Magenta;
       AddEventToolStripButton.Name = "AddEventToolStripButton";
       AddEventToolStripButton.Size = new Size(66, 22);
@@ -307,6 +316,7 @@
       // EditEventToolStripButton
       // 
       EditEventToolStripButton.Image = Properties.Resources.edit;
+      EditEventToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       EditEventToolStripButton.ImageTransparentColor = Color.Magenta;
       EditEventToolStripButton.Name = "EditEventToolStripButton";
       EditEventToolStripButton.Size = new Size(72, 22);
@@ -316,6 +326,7 @@
       // DeleteEventToolStripButton
       // 
       DeleteEventToolStripButton.Image = Properties.Resources.delete;
+      DeleteEventToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       DeleteEventToolStripButton.ImageTransparentColor = Color.Magenta;
       DeleteEventToolStripButton.Name = "DeleteEventToolStripButton";
       DeleteEventToolStripButton.Size = new Size(82, 22);
@@ -430,6 +441,7 @@
       DaysOffDataGridView.Name = "DaysOffDataGridView";
       DaysOffDataGridView.ReadOnly = true;
       DaysOffDataGridView.RowHeadersVisible = false;
+      DaysOffDataGridView.RowHeadersWidth = 62;
       DaysOffDataGridView.RowTemplate.ContextMenuStrip = AnnotationContextMenuStrip;
       DaysOffDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
       DaysOffDataGridView.Size = new Size(550, 529);
@@ -439,6 +451,7 @@
       // AnnotationId
       // 
       AnnotationId.HeaderText = "Id";
+      AnnotationId.MinimumWidth = 8;
       AnnotationId.Name = "AnnotationId";
       AnnotationId.ReadOnly = true;
       AnnotationId.Width = 50;
@@ -446,6 +459,7 @@
       // AnnotationDate
       // 
       AnnotationDate.HeaderText = "Date";
+      AnnotationDate.MinimumWidth = 8;
       AnnotationDate.Name = "AnnotationDate";
       AnnotationDate.ReadOnly = true;
       AnnotationDate.Width = 75;
@@ -453,6 +467,7 @@
       // AnnotationType
       // 
       AnnotationType.HeaderText = "Type";
+      AnnotationType.MinimumWidth = 8;
       AnnotationType.Name = "AnnotationType";
       AnnotationType.ReadOnly = true;
       AnnotationType.Width = 150;
@@ -460,12 +475,14 @@
       // AnnotationDescription
       // 
       AnnotationDescription.HeaderText = "Description";
+      AnnotationDescription.MinimumWidth = 8;
       AnnotationDescription.Name = "AnnotationDescription";
       AnnotationDescription.ReadOnly = true;
       AnnotationDescription.Width = 150;
       // 
       // AnnotationContextMenuStrip
       // 
+      AnnotationContextMenuStrip.ImageScalingSize = new Size(24, 24);
       AnnotationContextMenuStrip.Items.AddRange(new ToolStripItem[] { EditAnnotationToolStripMenuItem, DeleteAnnotationToolStripMenuItem });
       AnnotationContextMenuStrip.Name = "AnnotationContextMenuStrip";
       AnnotationContextMenuStrip.Size = new Size(130, 48);
@@ -487,9 +504,11 @@
       // AnnotationToolStrip
       // 
       AnnotationToolStrip.GripStyle = ToolStripGripStyle.Hidden;
+      AnnotationToolStrip.ImageScalingSize = new Size(24, 24);
       AnnotationToolStrip.Items.AddRange(new ToolStripItem[] { AddAnnotationToolStripButton, EditAnnotationToolStripButton, DeleteAnnotationToolStripButton });
       AnnotationToolStrip.Location = new Point(3, 3);
       AnnotationToolStrip.Name = "AnnotationToolStrip";
+      AnnotationToolStrip.Padding = new Padding(0, 0, 2, 0);
       AnnotationToolStrip.Size = new Size(550, 25);
       AnnotationToolStrip.TabIndex = 0;
       AnnotationToolStrip.Text = "toolStrip1";
@@ -497,6 +516,7 @@
       // AddAnnotationToolStripButton
       // 
       AddAnnotationToolStripButton.Image = Properties.Resources.add;
+      AddAnnotationToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       AddAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
       AddAnnotationToolStripButton.Name = "AddAnnotationToolStripButton";
       AddAnnotationToolStripButton.Size = new Size(66, 22);
@@ -506,6 +526,7 @@
       // EditAnnotationToolStripButton
       // 
       EditAnnotationToolStripButton.Image = Properties.Resources.edit;
+      EditAnnotationToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       EditAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
       EditAnnotationToolStripButton.Name = "EditAnnotationToolStripButton";
       EditAnnotationToolStripButton.Size = new Size(72, 22);
@@ -515,6 +536,7 @@
       // DeleteAnnotationToolStripButton
       // 
       DeleteAnnotationToolStripButton.Image = Properties.Resources.delete;
+      DeleteAnnotationToolStripButton.ImageScaling = ToolStripItemImageScaling.None;
       DeleteAnnotationToolStripButton.ImageTransparentColor = Color.Magenta;
       DeleteAnnotationToolStripButton.Name = "DeleteAnnotationToolStripButton";
       DeleteAnnotationToolStripButton.Size = new Size(82, 22);
@@ -549,6 +571,7 @@
       WeekDataGridView.ReadOnly = true;
       WeekDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
       WeekDataGridView.RowHeadersVisible = false;
+      WeekDataGridView.RowHeadersWidth = 62;
       WeekDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       WeekDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
       WeekDataGridView.Size = new Size(550, 554);
@@ -557,6 +580,7 @@
       // WeekNumber
       // 
       WeekNumber.HeaderText = "#";
+      WeekNumber.MinimumWidth = 8;
       WeekNumber.Name = "WeekNumber";
       WeekNumber.ReadOnly = true;
       WeekNumber.Width = 50;
@@ -564,6 +588,7 @@
       // DateStart
       // 
       DateStart.HeaderText = "Date";
+      DateStart.MinimumWidth = 8;
       DateStart.Name = "DateStart";
       DateStart.ReadOnly = true;
       DateStart.Width = 75;
@@ -571,6 +596,7 @@
       // CheckedTime
       // 
       CheckedTime.HeaderText = "Temps badgé";
+      CheckedTime.MinimumWidth = 8;
       CheckedTime.Name = "CheckedTime";
       CheckedTime.ReadOnly = true;
       CheckedTime.Width = 125;
@@ -578,6 +604,7 @@
       // OffTime
       // 
       OffTime.HeaderText = "Temps chomé";
+      OffTime.MinimumWidth = 8;
       OffTime.Name = "OffTime";
       OffTime.ReadOnly = true;
       OffTime.Width = 125;
@@ -585,6 +612,7 @@
       // TotalTime
       // 
       TotalTime.HeaderText = "Temps total";
+      TotalTime.MinimumWidth = 8;
       TotalTime.Name = "TotalTime";
       TotalTime.ReadOnly = true;
       TotalTime.Width = 125;
@@ -611,22 +639,27 @@
       // 
       SqliteLinkLabel.AutoSize = true;
       SqliteLinkLabel.Cursor = Cursors.Hand;
-      SqliteLinkLabel.Location = new Point(158, 15);
+      SqliteLinkLabel.Dock = DockStyle.Left;
+      SqliteLinkLabel.Location = new Point(151, 10);
       SqliteLinkLabel.Name = "SqliteLinkLabel";
-      SqliteLinkLabel.Size = new Size(103, 15);
+      SqliteLinkLabel.Padding = new Padding(0, 5, 0, 0);
+      SqliteLinkLabel.Size = new Size(103, 20);
       SqliteLinkLabel.TabIndex = 3;
       SqliteLinkLabel.TabStop = true;
       SqliteLinkLabel.Text = "time-tracker.sqlite";
+      SqliteLinkLabel.TextAlign = ContentAlignment.MiddleLeft;
       SqliteLinkLabel.Click += SqliteLinkLabel_Click;
       // 
       // LogLinkLabel
       // 
+      LogLinkLabel.AutoSize = true;
       LogLinkLabel.Cursor = Cursors.Hand;
       LogLinkLabel.Dock = DockStyle.Left;
       LogLinkLabel.Location = new Point(10, 10);
       LogLinkLabel.Margin = new Padding(0);
       LogLinkLabel.Name = "LogLinkLabel";
-      LogLinkLabel.Size = new Size(123, 25);
+      LogLinkLabel.Padding = new Padding(0, 5, 20, 0);
+      LogLinkLabel.Size = new Size(141, 20);
       LogLinkLabel.TabIndex = 2;
       LogLinkLabel.TabStop = true;
       LogLinkLabel.Text = "time-tracker-20xx.log";

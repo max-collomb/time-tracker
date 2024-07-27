@@ -58,7 +58,15 @@ namespace time_tracker
     {
       int diff = (7 + (dateTime.DayOfWeek - DayOfWeek.Monday)) % 7;
       DateTime monday = dateTime.AddDays(-1 * diff).Date;
-      return [new Day(monday), new Day(monday.AddDays(1)), new Day(monday.AddDays(2)), new Day(monday.AddDays(3)), new Day(monday.AddDays(4))];
+      return [
+        new Day(monday),
+        new Day(monday.AddDays(1)),
+        new Day(monday.AddDays(2)),
+        new Day(monday.AddDays(3)),
+        new Day(monday.AddDays(4)),
+        new Day(monday.AddDays(5)),
+        new Day(monday.AddDays(6))
+      ];
     }
 
     public static int HourMinStrToMin(string hm)

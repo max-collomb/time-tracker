@@ -61,12 +61,16 @@ namespace time_tracker
       List<Event> events = DataBase.GetEvents("usr_check");
       List<Annotation> annotations = DataBase.GetAnnotations();
       Dictionary<string, Annotation> annotationsByDate = new();
+      Dictionary<string, int> timeByDate = new();
+      Dictionary<string, int> timeOffByDate = new();
       foreach (Annotation annotation in annotations)
       {
         annotationsByDate.Add(annotation.Date, annotation);
+        if (annotation.Type == "half_day_off")
+          timeOffByDate.Add(annotation.Date, Day.WeekLoad / 10);
+        else if (annotation.Type == "day_off")
+          timeOffByDate.Add(annotation.Date, Day.WeekLoad / 5);
       }
-      Dictionary<string, int> timeByDate = new();
-      Dictionary<string, int> timeOffByDate = new();
       List<Event> dateEvents = new();
       for (int i = 0, length = events.Count; i < length; i++)
       {
@@ -82,7 +86,6 @@ namespace time_tracker
               annotationsByDate.ContainsKey(e.Date) ? annotationsByDate[e.Date] : null
             );
             timeByDate.Add(e.Date, day.TimeChecked);
-            timeOffByDate.Add(e.Date, day.TimeOff);
             dateEvents.Clear();
           }
         }
@@ -97,7 +100,7 @@ namespace time_tracker
         {
           int timeChecked = 0;
           int timeOff = 0;
-          for (int i = 0; i < 5; i++)
+          for (int i = 0; i < 7; i++)
           {
             string dayOfWeek = currentMonday.AddDays(i).Date.ToString("yyyy-MM-dd");
             if (timeByDate.ContainsKey(dayOfWeek))

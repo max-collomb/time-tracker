@@ -150,7 +150,7 @@ namespace time_tracker
         command.Parameters.AddWithValue("@lastmonth", lastMonth);
         using var reader = command.ExecuteReader();
         if (reader.Read())
-          return new Tuple<int, string, string>(reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+          return new Tuple<int, string, string>(reader.GetInt32(0), reader.IsDBNull(1) ? "" : reader.GetString(1), reader.IsDBNull(1) ? "" : reader.GetString(2));
       }
       return new Tuple<int, string, string>(0, "", "");
     }

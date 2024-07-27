@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Drawing.Drawing2D;
+using System.Drawing.Printing;
 using System.Globalization;
 
 namespace time_tracker
@@ -100,12 +101,9 @@ namespace time_tracker
         Properties.Settings.Default.TuesdayTarget,
         Properties.Settings.Default.WednesdayTarget,
         Properties.Settings.Default.ThursdayTarget,
-        Properties.Settings.Default.FridayTarget
-        //TimeHelper.HourMinStrToMin(Properties.Settings.Default.MondayTarget),
-        //TimeHelper.HourMinStrToMin(Properties.Settings.Default.TuesdayTarget),
-        //TimeHelper.HourMinStrToMin(Properties.Settings.Default.WednesdayTarget),
-        //TimeHelper.HourMinStrToMin(Properties.Settings.Default.ThursdayTarget),
-        //TimeHelper.HourMinStrToMin(Properties.Settings.Default.FridayTarget)
+        Properties.Settings.Default.FridayTarget,
+        0,
+        0,
       ];
       WeekLoad = Targets.Sum();
       Day.WeekLoad = WeekLoad;
@@ -118,10 +116,11 @@ namespace time_tracker
       if (WeekDays[TodayIdx].Checks.Count == 1) // seulement au premier badgeage du jour
       {
         Tuple<int, string, string> previousDayDetails = DataBase.GetPreviousDayChecks(DateTime.Now);
-        if (previousDayDetails.Item1 < 4 || previousDayDetails.Item1 % 2 == 1)
+        Annotation? annotation = DataBase.GetAnnotation(previousDayDetails.Item3);
+        if ((previousDayDetails.Item1 > 0) && ((previousDayDetails.Item1 < 4 && annotation == null) || previousDayDetails.Item1 % 2 == 1))
         {
           MessageBox.Show(
-            "Le nombre de badgeages est incorrect pour le " + DateTime.ParseExact(previousDayDetails.Item3, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("dd/MM/yyyy") + "\n" +
+            "Le nombre de badgeages est incorrect pour le " + DateTime.ParseExact(previousDayDetails.Item3, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("dddd dd/MM/yyyy") + "\n" +
             previousDayDetails.Item1.ToString() + " badgeage" + (previousDayDetails.Item1 > 1 ? "s" : "") + " : " + previousDayDetails.Item2 + "\n\n" +
             "Corrigez la situation dans la fenêtre d'historique",
             "Anomalie détectée",
@@ -181,7 +180,7 @@ namespace time_tracker
         int sum = 0;
         for (int i = 0; i <= TodayIdx; i++)
           sum += WeekDays[i].TimeChecked + WeekDays[i].TimeOff;
-        for (int i = TodayIdx + 1; i < 5; i++)
+        for (int i = TodayIdx + 1; i < WeekDays.Count; i++)
           sum += WeekDays[i].TimeOff;
         WeekValueLabel.Text = TimeHelper.MinToHourMinStr(sum);
         MainFormToolTip.SetToolTip(WeekValueLabel, WeekValueLabel.Text + " / " + TimeHelper.MinToHourMinStr(WeekLoad));
@@ -250,14 +249,14 @@ namespace time_tracker
 
     private void ChartPictureBox_Paint(object sender, PaintEventArgs e)
     {
-      string[] days = ["Lu", "Ma", "Me", "Je", "Ve"];
+      string[] days = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
       int maxDone = 600;
       int margin = 10;
       int padding = 8;
-      int chartWidth = 180;
-      int chartHeight = 140;
+      int chartWidth = ChartPictureBox.Width - 1;
+      int chartHeight = ChartPictureBox.Height;
       int labelHeight = 20;
-      int barWidth = (chartWidth - margin) / 5;
+      int barWidth = (chartWidth - margin) / Math.Max(5, TodayIdx + 1);
       int barHeight = chartHeight - labelHeight - margin;
       Graphics g = e.Graphics;
       g.Clear(this.BackColor);
@@ -267,7 +266,7 @@ namespace time_tracker
       SolidBrush fillBrushError = new(Color.FromArgb(77, 37, 37));
       HatchBrush hatchBrush = new(HatchStyle.WideUpwardDiagonal, Color.FromArgb(37, 70, 77), BackColor);
       SolidBrush fillBrushHl = new(Color.FromArgb(100, 187, 205));
-      for (int i = 0; i < 5; i++)
+      for (int i = 0; i <= Math.Max(5, TodayIdx); i++)
       {
         int offHeight = 0;
         if (WeekDays[i].TimeOff > 0)
@@ -277,7 +276,7 @@ namespace time_tracker
         }
         if (WeekDays[i].TimeChecked > 0)
         {
-          bool hasAnomaly = (i != TodayIdx) && (WeekDays[i].Checks.Count > 0) && (WeekDays[i].Checks.Count < 4 || WeekDays[i].Checks.Count % 2 == 1);
+          bool hasAnomaly = (i != TodayIdx) && (WeekDays[i].Checks.Count > 0) && ((WeekDays[i].Checks.Count < 4 && WeekDays[i].Annotation == null) || WeekDays[i].Checks.Count % 2 == 1);
           int doneHeight = Math.Min(barHeight * WeekDays[i].TimeChecked / maxDone, barHeight);
           g.FillRectangle(
             hasAnomaly ? fillBrushError : fillBrush,
@@ -289,7 +288,8 @@ namespace time_tracker
             )
           );
         }
-        g.DrawString(days[i], this.Font, i == TodayIdx ? fillBrushHl : fillBrush, margin + padding + i * barWidth, 2);
+        g.DrawString(days[i], this.Font, i == TodayIdx ? fillBrushHl : fillBrush, new RectangleF(margin + i * barWidth, 2, barWidth, barHeight), new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Near });
+          //margin + padding + i * barWidth, 2);
         g.DrawRectangle(borderPen, new RectangleF(margin + i * barWidth, 0, barWidth, barHeight + labelHeight));
         int targetHeight = barHeight * Targets[i] / maxDone;
         g.DrawLine(targetPen, margin + i * barWidth, labelHeight + barHeight - targetHeight, margin + (i + 1) * barWidth, labelHeight + barHeight - targetHeight);
@@ -305,8 +305,8 @@ namespace time_tracker
     private void ChartPictureBox_MouseMove(object sender, MouseEventArgs e)
     {
       int margin = 10;
-      int chartWidth = 180;
-      int barWidth = (chartWidth - margin) / 5;
+      int chartWidth = ChartPictureBox.Width - 1;
+      int barWidth = (chartWidth - margin) / Math.Max(5, TodayIdx + 1);
 
       int day = -1;
       string tooltipContent = string.Empty;
@@ -314,12 +314,12 @@ namespace time_tracker
       if (e.X >= margin)
       {
         day = (e.X - margin) / barWidth;
-        if (day >= 0 && day < 5)
+        if (day >= 0 && day < WeekDays.Count)
         {
           tooltipContent = WeekDays[day].Date.ToString("ddd dd/MM");
           if (WeekDays[day].TimeChecked + WeekDays[day].TimeOff > 0)
             tooltipContent += "\n" + TimeHelper.MinToHourMinStr(WeekDays[day].TimeChecked + WeekDays[day].TimeOff) + " / " + TimeHelper.MinToHourMinStr(Targets[day]);
-          bool hasAnomaly = (day != TodayIdx) && (WeekDays[day].Checks.Count > 0) && (WeekDays[day].Checks.Count < 4 || WeekDays[day].Checks.Count % 2 == 1);
+          bool hasAnomaly = (day != TodayIdx) && (WeekDays[day].Checks.Count > 0) && ((WeekDays[day].Checks.Count < 4 && WeekDays[day].Annotation == null) || WeekDays[day].Checks.Count % 2 == 1);
           if (hasAnomaly) {
             tooltipContent += "\n\nANOMALIE : " + WeekDays[day].Checks.Count + " badgeage" + (WeekDays[day].Checks.Count > 1 ? "s" : "") +
               "\n(nombre pair " + char.ConvertFromUtf32(int.Parse("2265", System.Globalization.NumberStyles.HexNumber)) + " 4 attendu)";
@@ -416,8 +416,8 @@ namespace time_tracker
       {
         DayContextMenu = -1;
         int margin = 10;
-        int chartWidth = 180;
-        int barWidth = (chartWidth - margin) / 5;
+        int chartWidth = ChartPictureBox.Width - 1;
+        int barWidth = (chartWidth - margin) / Math.Max(5, TodayIdx + 1);
 
         int day = -1;
         string tooltipContent = string.Empty;
@@ -425,7 +425,7 @@ namespace time_tracker
         if (e.X >= margin)
         {
           day = (e.X - margin) / barWidth;
-          if (day >= 0 && day < 5)
+          if (day >= 0 && day < WeekDays.Count)
           {
             DayContextMenu = day;
             DayDateToolStripMenuItem.Text = WeekDays[day].Date.ToString("dddd dd/MM");
@@ -438,7 +438,7 @@ namespace time_tracker
 
     private void DayOffToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (DayContextMenu >= 0 && DayContextMenu < 5)
+      if (DayContextMenu >= 0 && DayContextMenu < WeekDays.Count)
       {
         string type = (sender == DayHalfOffToolStripMenuItem) ? "half_day_off" : "day_off";
         if (WeekDays[DayContextMenu].Annotation?.Type == type)
