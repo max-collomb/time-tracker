@@ -18,8 +18,16 @@ namespace time_tracker
       WednesdayMaskedTextBox.Text = TimeHelper.MinToHourMinStr(Properties.Settings.Default.WednesdayTarget);
       ThursdayMaskedTextBox.Text = TimeHelper.MinToHourMinStr(Properties.Settings.Default.ThursdayTarget);
       FridayMaskedTextBox.Text = TimeHelper.MinToHourMinStr(Properties.Settings.Default.FridayTarget);
+      MondayPauseUpDown.Value = Properties.Settings.Default.MondayPause;
+      TuesdayPauseUpDown.Value = Properties.Settings.Default.TuesdayPause;
+      WednesdayPauseUpDown.Value = Properties.Settings.Default.WednesdayPause;
+      ThursdayPauseUpDown.Value = Properties.Settings.Default.ThursdayPause;
+      FridayPauseUpDown.Value = Properties.Settings.Default.FridayPause;
       AutoReminderCheckBox.Checked = Properties.Settings.Default.AutoReminder;
       AutoStartCheckBox.Checked = rkApp?.GetValue("TimeTracker") != null;
+#if !DEBUG
+  AutoStartCheckBox.Visible = false;
+#endif
     }
 
     private void SaveButton_Click(object sender, EventArgs e)
@@ -30,6 +38,11 @@ namespace time_tracker
       Properties.Settings.Default.WednesdayTarget = TimeHelper.HourMinStrToMin(WednesdayMaskedTextBox.Text);
       Properties.Settings.Default.ThursdayTarget = TimeHelper.HourMinStrToMin(ThursdayMaskedTextBox.Text);
       Properties.Settings.Default.FridayTarget = TimeHelper.HourMinStrToMin(FridayMaskedTextBox.Text);
+      Properties.Settings.Default.MondayPause = (int)MondayPauseUpDown.Value;
+      Properties.Settings.Default.TuesdayPause = (int)TuesdayPauseUpDown.Value;
+      Properties.Settings.Default.WednesdayPause = (int)WednesdayPauseUpDown.Value;
+      Properties.Settings.Default.ThursdayPause = (int)ThursdayPauseUpDown.Value;
+      Properties.Settings.Default.FridayPause = (int)FridayPauseUpDown.Value;
       Properties.Settings.Default.AutoReminder = AutoReminderCheckBox.Checked;
 #if !DEBUG
       if (rkApp != null)

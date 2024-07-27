@@ -319,7 +319,6 @@
       // 
       MondayPauseUpDown.BackColor = Color.FromArgb(51, 51, 51);
       MondayPauseUpDown.BorderStyle = BorderStyle.FixedSingle;
-      MondayPauseUpDown.Enabled = false;
       MondayPauseUpDown.ForeColor = Color.Silver;
       MondayPauseUpDown.Location = new Point(3, 23);
       MondayPauseUpDown.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
@@ -333,7 +332,6 @@
       // 
       TuesdayPauseUpDown.BackColor = Color.FromArgb(51, 51, 51);
       TuesdayPauseUpDown.BorderStyle = BorderStyle.FixedSingle;
-      TuesdayPauseUpDown.Enabled = false;
       TuesdayPauseUpDown.ForeColor = Color.Silver;
       TuesdayPauseUpDown.Location = new Point(70, 23);
       TuesdayPauseUpDown.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
@@ -347,7 +345,6 @@
       // 
       WednesdayPauseUpDown.BackColor = Color.FromArgb(51, 51, 51);
       WednesdayPauseUpDown.BorderStyle = BorderStyle.FixedSingle;
-      WednesdayPauseUpDown.Enabled = false;
       WednesdayPauseUpDown.ForeColor = Color.Silver;
       WednesdayPauseUpDown.Location = new Point(137, 23);
       WednesdayPauseUpDown.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
@@ -361,7 +358,6 @@
       // 
       ThursdayPauseUpDown.BackColor = Color.FromArgb(51, 51, 51);
       ThursdayPauseUpDown.BorderStyle = BorderStyle.FixedSingle;
-      ThursdayPauseUpDown.Enabled = false;
       ThursdayPauseUpDown.ForeColor = Color.Silver;
       ThursdayPauseUpDown.Location = new Point(204, 23);
       ThursdayPauseUpDown.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
@@ -375,7 +371,6 @@
       // 
       FridayPauseUpDown.BackColor = Color.FromArgb(51, 51, 51);
       FridayPauseUpDown.BorderStyle = BorderStyle.FixedSingle;
-      FridayPauseUpDown.Enabled = false;
       FridayPauseUpDown.ForeColor = Color.Silver;
       FridayPauseUpDown.Location = new Point(271, 23);
       FridayPauseUpDown.Maximum = new decimal(new int[] { 120, 0, 0, 0 });
@@ -411,7 +406,6 @@
       AutoReminderCheckBox.TabIndex = 4;
       AutoReminderCheckBox.Text = "Activer automatiquement les rappels";
       AutoReminderCheckBox.UseVisualStyleBackColor = true;
-      AutoReminderCheckBox.Visible = false;
       AutoReminderCheckBox.Click += AutoReminderCheckBox_Click;
       // 
       // BottomPanel

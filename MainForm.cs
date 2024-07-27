@@ -12,6 +12,7 @@ namespace time_tracker
     public int TodayIdx { get; set; }
     public int HoveredDay { get; set; }
     public List<int> Targets { get; set; }
+    public List<int> Pauses { get; set; }
     public int WeekLoad { get; set; }
     public int CurrentDate { get; set; }
     public string CurrentTime { get; set; }
@@ -28,6 +29,7 @@ namespace time_tracker
       CurrentDate = -1;
       IsInProgress = null;
       Targets = [];
+      Pauses = [];
       string dbFileName = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName);
       bool openSettingsForm = !File.Exists(dbFileName);
       DataBase.Initialize(dbFileName);
@@ -102,6 +104,15 @@ namespace time_tracker
         Properties.Settings.Default.WednesdayTarget,
         Properties.Settings.Default.ThursdayTarget,
         Properties.Settings.Default.FridayTarget,
+        60,
+        0,
+      ];
+      Pauses = [
+        Properties.Settings.Default.MondayPause,
+        Properties.Settings.Default.TuesdayPause,
+        Properties.Settings.Default.WednesdayPause,
+        Properties.Settings.Default.ThursdayPause,
+        Properties.Settings.Default.FridayPause,
         0,
         0,
       ];
@@ -240,11 +251,55 @@ namespace time_tracker
         MainFormToolTip.SetToolTip(checkLabel, (isOut ? "Sortie" : "Entrée") + "\n(Double-clic ou menu contextuel pour modifier)");
         isOut = !isOut;
       }
-
+# if DEBUG
+      if (Properties.Settings.Default.AutoReminder)
+      {
+        List<string> targetSteps = GetTargetSteps();
+        foreach (string step in targetSteps)
+        {
+          Label stepLabel = new()
+          {
+            Text = step,
+            AutoSize = true,
+            Margin = new Padding(0, 0, 0, 0),
+            ForeColor = Color.FromArgb(96, 96, 96),
+          };
+          CenterFlowLayoutPanel.Controls.Add(stepLabel);
+        }
+      }
+#endif
       CurrentTime = string.Empty;
       CurrentDate = DateTime.Now.DayOfYear;
       SecondTimer_Tick(new object(), new EventArgs());
       ChartPictureBox.Refresh();
+    }
+
+    private List<string> GetTargetSteps()
+    {
+      int count = WeekDays[TodayIdx].Checks.Count;
+      bool isHalfDayOff = WeekDays[TodayIdx].Annotation?.Type == "half_day_off";
+      List<string> steps = new();
+      if (count == 0 || (count > 3 && count % 2 == 0))
+        return steps;
+      if (isHalfDayOff && count == 2)
+        return steps;
+      DateTime lastCheck = DateTime.ParseExact(WeekDays[TodayIdx].Checks[count - 1].Time, "HH:mm", CultureInfo.InvariantCulture);
+      int target = Targets[TodayIdx];
+      if (lastCheck.Hour < 12 && Pauses[TodayIdx] > 0)
+      {
+        // on ajoute la pause de midi
+        string pauseStart = Pauses[TodayIdx] > 100 ? "12:00" : "12:15";
+        target += Pauses[TodayIdx];
+        steps.Add(pauseStart);
+        steps.Add(DateTime.ParseExact(pauseStart, "HH:mm", CultureInfo.InvariantCulture).AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
+      }
+      if (count % 2 == 1)
+      {
+        int timeLeft = target - WeekDays[TodayIdx].TimeChecked - WeekDays[TodayIdx].TimeOff;
+        if (timeLeft > 0)
+          steps.Add(DateTime.Now.AddMinutes(timeLeft).ToString("HH:mm"));
+      }
+      return steps;
     }
 
     private void ChartPictureBox_Paint(object sender, PaintEventArgs e)

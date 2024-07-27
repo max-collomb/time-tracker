@@ -32,5 +32,20 @@
     <Setting Name="HistoryFormPosition" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">-1, -1</Value>
     </Setting>
+    <Setting Name="MondayPause" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="TuesdayPause" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="WednesdayPause" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="ThursdayPause" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="FridayPause" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

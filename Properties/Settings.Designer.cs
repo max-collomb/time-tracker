@@ -142,5 +142,65 @@ namespace time_tracker.Properties {
                 this["HistoryFormPosition"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int MondayPause {
+            get {
+                return ((int)(this["MondayPause"]));
+            }
+            set {
+                this["MondayPause"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int TuesdayPause {
+            get {
+                return ((int)(this["TuesdayPause"]));
+            }
+            set {
+                this["TuesdayPause"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int WednesdayPause {
+            get {
+                return ((int)(this["WednesdayPause"]));
+            }
+            set {
+                this["WednesdayPause"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int ThursdayPause {
+            get {
+                return ((int)(this["ThursdayPause"]));
+            }
+            set {
+                this["ThursdayPause"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int FridayPause {
+            get {
+                return ((int)(this["FridayPause"]));
+            }
+            set {
+                this["FridayPause"] = value;
+            }
+        }
     }
 }
