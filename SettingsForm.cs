@@ -25,8 +25,8 @@ namespace time_tracker
       FridayPauseUpDown.Value = Properties.Settings.Default.FridayPause;
       AutoReminderCheckBox.Checked = Properties.Settings.Default.AutoReminder;
       AutoStartCheckBox.Checked = rkApp?.GetValue("TimeTracker") != null;
-#if !DEBUG
-  AutoStartCheckBox.Visible = false;
+#if DEBUG
+      AutoReminderCheckBox.Visible = true;
 #endif
     }
 
@@ -61,6 +61,14 @@ namespace time_tracker
     private void GithubLinkLabel_Click(object sender, EventArgs e)
     {
       Process.Start(new ProcessStartInfo { FileName = "https://github.com/max-collomb/time-tracker", UseShellExecute = true });
+    }
+
+    private void SettingsForm_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.Control && e.Alt)
+      {
+        AutoReminderCheckBox.Visible = !AutoReminderCheckBox.Visible;
+      }
     }
   }
 }

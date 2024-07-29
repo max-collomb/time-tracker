@@ -406,6 +406,7 @@
       AutoReminderCheckBox.TabIndex = 4;
       AutoReminderCheckBox.Text = "Activer automatiquement les rappels";
       AutoReminderCheckBox.UseVisualStyleBackColor = true;
+      AutoReminderCheckBox.Visible = false;
       AutoReminderCheckBox.Click += AutoReminderCheckBox_Click;
       // 
       // BottomPanel
@@ -529,11 +530,13 @@
       Controls.Add(TimeSectionLabel);
       ForeColor = Color.White;
       FormBorderStyle = FormBorderStyle.FixedSingle;
+      KeyPreview = true;
       Name = "SettingsForm";
       Padding = new Padding(10);
       StartPosition = FormStartPosition.CenterParent;
       Text = "Options";
       Load += SettingsForm_Load;
+      KeyDown += SettingsForm_KeyDown;
       TimeTableLayoutPanel.ResumeLayout(false);
       TimeTableLayoutPanel.PerformLayout();
       PauseTableLayoutPanel.ResumeLayout(false);

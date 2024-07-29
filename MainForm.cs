@@ -104,7 +104,7 @@ namespace time_tracker
         Properties.Settings.Default.WednesdayTarget,
         Properties.Settings.Default.ThursdayTarget,
         Properties.Settings.Default.FridayTarget,
-        60,
+        0,
         0,
       ];
       Pauses = [
@@ -148,9 +148,7 @@ namespace time_tracker
 
     private void MainForm_Load(object sender, EventArgs e)
     {
-#if !DEBUG
       DataBase.InsertEvent("app_start");
-#endif
       Rectangle bounds = new(Properties.Settings.Default.WindowPosition, Size);
       if (Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(bounds)))
       {
@@ -251,7 +249,6 @@ namespace time_tracker
         MainFormToolTip.SetToolTip(checkLabel, (isOut ? "Sortie" : "Entrée") + "\n(Double-clic ou menu contextuel pour modifier)");
         isOut = !isOut;
       }
-# if DEBUG
       if (Properties.Settings.Default.AutoReminder)
       {
         List<string> targetSteps = GetTargetSteps();
@@ -267,7 +264,6 @@ namespace time_tracker
           CenterFlowLayoutPanel.Controls.Add(stepLabel);
         }
       }
-#endif
       CurrentTime = string.Empty;
       CurrentDate = DateTime.Now.DayOfYear;
       SecondTimer_Tick(new object(), new EventArgs());
@@ -321,7 +317,7 @@ namespace time_tracker
       SolidBrush fillBrushError = new(Color.FromArgb(77, 37, 37));
       HatchBrush hatchBrush = new(HatchStyle.WideUpwardDiagonal, Color.FromArgb(37, 70, 77), BackColor);
       SolidBrush fillBrushHl = new(Color.FromArgb(100, 187, 205));
-      for (int i = 0; i <= Math.Max(5, TodayIdx); i++)
+      for (int i = 0; i < Math.Max(5, TodayIdx + 1); i++)
       {
         int offHeight = 0;
         if (WeekDays[i].TimeOff > 0)
