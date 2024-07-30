@@ -418,7 +418,7 @@
       BottomPanel.Location = new Point(10, 285);
       BottomPanel.Name = "BottomPanel";
       BottomPanel.Size = new Size(336, 30);
-      BottomPanel.TabIndex = 5;
+      BottomPanel.TabIndex = 14;
       // 
       // CancelFormButton
       // 
@@ -485,7 +485,7 @@
       tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
       tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
       tableLayoutPanel1.Size = new Size(336, 25);
-      tableLayoutPanel1.TabIndex = 8;
+      tableLayoutPanel1.TabIndex = 13;
       // 
       // ProductNameLabel
       // 

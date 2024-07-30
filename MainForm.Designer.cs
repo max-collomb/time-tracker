@@ -81,7 +81,7 @@
       // 
       DayContextMenuStrip.Items.AddRange(new ToolStripItem[] { DayDateToolStripMenuItem, toolStripSeparator1, DayHalfOffToolStripMenuItem, DayOffToolStripMenuItem });
       DayContextMenuStrip.Name = "DayContextMenuStrip";
-      DayContextMenuStrip.Size = new Size(194, 98);
+      DayContextMenuStrip.Size = new Size(194, 76);
       // 
       // DayDateToolStripMenuItem
       // 
@@ -322,11 +322,14 @@
       Controls.Add(BottomPanel);
       FormBorderStyle = FormBorderStyle.FixedSingle;
       Icon = (Icon)resources.GetObject("$this.Icon");
+      KeyPreview = true;
       MaximizeBox = false;
       Name = "MainForm";
       ShowIcon = false;
+      Activated += MainForm_Activated;
       FormClosing += MainForm_FormClosing;
       Load += MainForm_Load;
+      KeyDown += MainForm_KeyDown;
       ((System.ComponentModel.ISupportInitialize)ChartPictureBox).EndInit();
       DayContextMenuStrip.ResumeLayout(false);
       TopPanel.ResumeLayout(false);

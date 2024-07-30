@@ -42,6 +42,7 @@
 [x] sauvegarder l'onglet actif dans HistoryForm dans les Settings
 [x] Si démarrage appli ou nouvelle journée détectée => compter le nombre de badgeage sur la journée précédente => si impair, ajouter automatiquement un event à 18h et afficher un messagebox
 [x] Prendre en compte la cible hebdo pour le calcul de l'heure de fin de journée (exemple : si -15m le lundi, reprorter l'heure de fin du mardi de 15m pour rattrapper)
-[ ] Définir des rappels (son + icone clignotante dans barre des tâches)
-[ ] Définir des rappels automatiques après chaque badgeage
+[x] Définir des rappels (son + icone clignotante dans barre des tâches)
+[x] Définir des rappels automatiques après chaque badgeage
+[x] Badge sur l'icone de la barre des tâches en cas de notif, possible ? ce serait plus visible que le FlashWindow
 [ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\

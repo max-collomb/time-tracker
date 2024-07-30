@@ -1,7 +1,6 @@
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Drawing.Drawing2D;
-using System.Drawing.Printing;
 using System.Globalization;
 
 namespace time_tracker
@@ -19,7 +18,10 @@ namespace time_tracker
     public bool? IsInProgress { get; set; }
     public HistoryForm? HistoryForm { get; set; }
     public ThumbnailToolBarButton? ThumbnailButton { get; set; }
-    public int DayContextMenu {  get; set; }
+    public int DayContextMenu { get; set; }
+    public bool AutoCreateReminder { get; set; }
+    public bool IsReminderEnabled { get; set; }
+    public string Reminder { get; set; }
     public MainForm()
     {
       WeekDays = [];
@@ -28,6 +30,9 @@ namespace time_tracker
       CurrentTime = "";
       CurrentDate = -1;
       IsInProgress = null;
+      IsReminderEnabled = false;
+      Reminder = string.Empty;
+      AutoCreateReminder = Properties.Settings.Default.AutoReminder;
       Targets = [];
       Pauses = [];
       string dbFileName = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Program.DbFileName);
@@ -122,7 +127,13 @@ namespace time_tracker
 
     private void ClockInOutButton_Click(object? sender, EventArgs e)
     {
+      System.Media.SoundPlayer player = new()
+      {
+        Stream = (WeekDays[TodayIdx].Checks.Count % 2 == 0) ? Properties.Resources.on : Properties.Resources.off
+      };
+      player.Play();
       DataBase.InsertEvent();
+      AutoCreateReminder = Properties.Settings.Default.AutoReminder;
       RefreshTimeData();
       if (WeekDays[TodayIdx].Checks.Count == 1) // seulement au premier badgeage du jour
       {
@@ -176,6 +187,7 @@ namespace time_tracker
       Text = currentTime + ":" + DateTime.Now.Second.ToString("00");
       if (CurrentDate != DateTime.Now.DayOfYear)
       {
+        AutoCreateReminder = Properties.Settings.Default.AutoReminder;
         DataBase.InsertDaysOff();
         RefreshTimeData();
         return;
@@ -194,22 +206,28 @@ namespace time_tracker
         WeekValueLabel.Text = TimeHelper.MinToHourMinStr(sum);
         MainFormToolTip.SetToolTip(WeekValueLabel, WeekValueLabel.Text + " / " + TimeHelper.MinToHourMinStr(WeekLoad));
         ChartPictureBox.Refresh();
+
+        if (IsReminderEnabled && Reminder != null && DateTime.Now.ToString("HH:mm") == Reminder)
+        {
+          Reminder = string.Empty;
+          IsReminderEnabled = false;
+          RefreshTimeData();
+          BeepBeep();
+          if (TaskbarManager.IsPlatformSupported && MainForm.ActiveForm == null)
+          {
+            TaskbarManager.Instance.SetOverlayIcon(Properties.Resources.alert, "Il est temps de badger");
+          }
+        }
       }
+    }
 
-      //if (reminderEnabled && reminder != null && DateTime.Now.Hour == reminder.Hour && DateTime.Now.Minute == reminder.Minute)
-      //{
-      //    reminder = null;
-      //    reminderEnabled = false;
-      //    reminderDropDownBtn.BackgroundImage = global::kelio_client.Properties.Resources.notif_disabled;
-      //    BeepBeep();
-      //    if (MainForm.ActiveForm == null)
-      //        FlashWindowUtil.FlashWindowEx(this.Handle);
-      //}
-      //if (date != DateTime.Now.DayOfYear)
-      //{
-      //    _ = Consult();
-      //}
-
+    private void BeepBeep()
+    {
+      System.Media.SoundPlayer player = new()
+      {
+        Stream = Properties.Resources.notif
+      };
+      player.Play();
     }
 
     private void RefreshTimeData()
@@ -252,16 +270,33 @@ namespace time_tracker
       if (Properties.Settings.Default.AutoReminder)
       {
         List<string> targetSteps = GetTargetSteps();
+        bool first = true;
         foreach (string step in targetSteps)
         {
+          if (first && Reminder == string.Empty && AutoCreateReminder)
+          {
+            Reminder = step;
+            IsReminderEnabled = true;
+            AutoCreateReminder = false;
+          }
+          string labelText = step;
+          if (Reminder == step)
+            labelText = char.ConvertFromUtf32(int.Parse(IsReminderEnabled ? "1F514" : "1F515", System.Globalization.NumberStyles.HexNumber)) + step;
           Label stepLabel = new()
           {
-            Text = step,
+            Text = labelText,
             AutoSize = true,
             Margin = new Padding(0, 0, 0, 0),
             ForeColor = Color.FromArgb(96, 96, 96),
+            DataContext = step
           };
+          if (first)
+          {
+            stepLabel.DoubleClick += ReminderLabelDoubleClick;
+            MainFormToolTip.SetToolTip(stepLabel, "Double-clic pour modifier le rappel");
+          }
           CenterFlowLayoutPanel.Controls.Add(stepLabel);
+          first = false;
         }
       }
       CurrentTime = string.Empty;
@@ -281,21 +316,23 @@ namespace time_tracker
         return steps;
       DateTime lastCheck = DateTime.ParseExact(WeekDays[TodayIdx].Checks[count - 1].Time, "HH:mm", CultureInfo.InvariantCulture);
       int target = 0;
-      for(int i = 0; i <= TodayIdx; i++)
+      for (int i = 0; i <= TodayIdx; i++)
       {
         target += Targets[i] - WeekDays[i].TimeChecked - WeekDays[i].TimeOff;
       }
       if (lastCheck.Hour < 12 && Pauses[TodayIdx] > 0 && !isHalfDayOff)
       {
         // on ajoute la pause de midi
-        string pauseStart = Pauses[TodayIdx] > 100 ? "12:00" : "12:15";
+        string pauseStart = (IsReminderEnabled && !string.IsNullOrEmpty(Reminder)) ? Reminder : (Pauses[TodayIdx] > 100 ? "12:00" : "12:15");
         target += Pauses[TodayIdx];
         steps.Add(pauseStart);
         steps.Add(DateTime.ParseExact(pauseStart, "HH:mm", CultureInfo.InvariantCulture).AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
       }
       if (count % 2 == 1)
       {
-        if (target > 0)
+        if (IsReminderEnabled && !string.IsNullOrEmpty (Reminder))
+          steps.Add(Reminder);
+        else if (target > 0)
           steps.Add(DateTime.Now.AddMinutes(target).ToString("HH:mm"));
       }
       else if (lastCheck.Hour >= 12 && lastCheck.Hour < 14 && Pauses[TodayIdx] > 0 && !isHalfDayOff && target > 0)
@@ -348,7 +385,7 @@ namespace time_tracker
           );
         }
         g.DrawString(days[i], this.Font, i == TodayIdx ? fillBrushHl : fillBrush, new RectangleF(margin + i * barWidth, 2, barWidth, barHeight), new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Near });
-          //margin + padding + i * barWidth, 2);
+        //margin + padding + i * barWidth, 2);
         g.DrawRectangle(borderPen, new RectangleF(margin + i * barWidth, 0, barWidth, barHeight + labelHeight));
         int targetHeight = barHeight * Targets[i] / maxDone;
         g.DrawLine(targetPen, margin + i * barWidth, labelHeight + barHeight - targetHeight, margin + (i + 1) * barWidth, labelHeight + barHeight - targetHeight);
@@ -379,7 +416,8 @@ namespace time_tracker
           if (WeekDays[day].TimeChecked + WeekDays[day].TimeOff > 0)
             tooltipContent += "\n" + TimeHelper.MinToHourMinStr(WeekDays[day].TimeChecked + WeekDays[day].TimeOff) + " / " + TimeHelper.MinToHourMinStr(Targets[day]);
           bool hasAnomaly = (day != TodayIdx) && (WeekDays[day].Checks.Count > 0) && ((WeekDays[day].Checks.Count < 4 && WeekDays[day].Annotation == null) || WeekDays[day].Checks.Count % 2 == 1);
-          if (hasAnomaly) {
+          if (hasAnomaly)
+          {
             tooltipContent += "\n\nANOMALIE : " + WeekDays[day].Checks.Count + " badgeage" + (WeekDays[day].Checks.Count > 1 ? "s" : "") +
               "\n(nombre pair " + char.ConvertFromUtf32(int.Parse("2265", System.Globalization.NumberStyles.HexNumber)) + " 4 attendu)";
           }
@@ -435,25 +473,34 @@ namespace time_tracker
       Event? check = (Event?)((Label?)sender)?.DataContext;
       if (check != null)
       {
-        using (var eventForm = new EventForm(check.Date, check.Time, false))
+        using var eventForm = new EventForm(check.Date, check.Time, false);
+        if (eventForm.ShowDialog(this) == DialogResult.OK)
         {
-          if (eventForm.ShowDialog(this) == DialogResult.OK)
-          {
-            DataBase.UpdateEvent(check, eventForm.Date, eventForm.Time);
-            RefreshTimeData();
-          }
+          DataBase.UpdateEvent(check, eventForm.Date, eventForm.Time);
+          RefreshTimeData();
         }
+      }
+    }
+
+    private void ReminderLabelDoubleClick(object? sender, EventArgs e)
+    {
+      string? time = (string?)((Label?)sender)?.DataContext;
+      if (!string.IsNullOrEmpty(time))
+      {
+        using ReminderForm reminderForm = new(time);
+        reminderForm.ShowDialog(this);
+        Reminder = reminderForm.IsEnabled ? reminderForm.Time : string.Empty;
+        IsReminderEnabled = reminderForm.IsEnabled;
+        RefreshTimeData();
       }
     }
 
     private void OptionsButton_Click(object sender, EventArgs e)
     {
-      using (SettingsForm settingsForm = new SettingsForm())
-      {
-        settingsForm.ShowDialog(this);
-        LoadSettings();
-        RefreshTimeData();
-      }
+      using SettingsForm settingsForm = new();
+      settingsForm.ShowDialog(this);
+      LoadSettings();
+      RefreshTimeData();
     }
 
     void HistoryForm_Closed(object? sender, FormClosedEventArgs e)
@@ -510,6 +557,28 @@ namespace time_tracker
             DataBase.InsertAnnotation(WeekDays[DayContextMenu].SqlDate, type, "");
         }
         RefreshTimeData();
+      }
+    }
+
+    private void MainForm_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.F5)
+      {
+        RefreshTimeData();
+      }
+    }
+
+    private void ToggleReminderToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      IsReminderEnabled = !IsReminderEnabled;
+      RefreshTimeData();
+    }
+
+    private void MainForm_Activated(object sender, EventArgs e)
+    {
+      if (TaskbarManager.IsPlatformSupported)
+      {
+        TaskbarManager.Instance.SetOverlayIcon(null, "");
       }
     }
   }
