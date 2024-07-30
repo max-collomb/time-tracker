@@ -1,4 +1,3 @@
-v0.1 :
 [x] Raccourci badgeage dans barre des tâches
 [x] Recharger les settings après fermeture de la fenêtre d'options
 [x] fenêtre historique : repasser les boutons en thème clair
@@ -42,8 +41,7 @@ v0.1 :
 [x] HistoryForm : suppression de (demi-)journées chomées
 [x] sauvegarder l'onglet actif dans HistoryForm dans les Settings
 [x] Si démarrage appli ou nouvelle journée détectée => compter le nombre de badgeage sur la journée précédente => si impair, ajouter automatiquement un event à 18h et afficher un messagebox
-
-v1.0 :
-[ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\
+[x] Prendre en compte la cible hebdo pour le calcul de l'heure de fin de journée (exemple : si -15m le lundi, reprorter l'heure de fin du mardi de 15m pour rattrapper)
 [ ] Définir des rappels (son + icone clignotante dans barre des tâches)
 [ ] Définir des rappels automatiques après chaque badgeage
+[ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\

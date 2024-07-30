@@ -280,8 +280,12 @@ namespace time_tracker
       if (isHalfDayOff && count == 2)
         return steps;
       DateTime lastCheck = DateTime.ParseExact(WeekDays[TodayIdx].Checks[count - 1].Time, "HH:mm", CultureInfo.InvariantCulture);
-      int target = Targets[TodayIdx];
-      if (lastCheck.Hour < 12 && Pauses[TodayIdx] > 0)
+      int target = 0;
+      for(int i = 0; i <= TodayIdx; i++)
+      {
+        target += Targets[i] - WeekDays[i].TimeChecked - WeekDays[i].TimeOff;
+      }
+      if (lastCheck.Hour < 12 && Pauses[TodayIdx] > 0 && !isHalfDayOff)
       {
         // on ajoute la pause de midi
         string pauseStart = Pauses[TodayIdx] > 100 ? "12:00" : "12:15";
@@ -291,9 +295,13 @@ namespace time_tracker
       }
       if (count % 2 == 1)
       {
-        int timeLeft = target - WeekDays[TodayIdx].TimeChecked - WeekDays[TodayIdx].TimeOff;
-        if (timeLeft > 0)
-          steps.Add(DateTime.Now.AddMinutes(timeLeft).ToString("HH:mm"));
+        if (target > 0)
+          steps.Add(DateTime.Now.AddMinutes(target).ToString("HH:mm"));
+      }
+      else if (lastCheck.Hour >= 12 && lastCheck.Hour < 14 && Pauses[TodayIdx] > 0 && !isHalfDayOff && target > 0)
+      {
+        steps.Add(lastCheck.AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
+        steps.Add(DateTime.Now.AddMinutes(target + Pauses[TodayIdx]).ToString("HH:mm"));
       }
       return steps;
     }

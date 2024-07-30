@@ -123,7 +123,7 @@
       TuesdayMaskedTextBox.Mask = "00:00";
       TuesdayMaskedTextBox.Name = "TuesdayMaskedTextBox";
       TuesdayMaskedTextBox.Size = new Size(61, 23);
-      TuesdayMaskedTextBox.TabIndex = 16;
+      TuesdayMaskedTextBox.TabIndex = 2;
       TuesdayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // MondayMaskedTextBox
@@ -136,7 +136,7 @@
       MondayMaskedTextBox.Mask = "00:00";
       MondayMaskedTextBox.Name = "MondayMaskedTextBox";
       MondayMaskedTextBox.Size = new Size(61, 23);
-      MondayMaskedTextBox.TabIndex = 15;
+      MondayMaskedTextBox.TabIndex = 1;
       MondayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // WednesdayMaskedTextBox
@@ -149,7 +149,7 @@
       WednesdayMaskedTextBox.Mask = "00:00";
       WednesdayMaskedTextBox.Name = "WednesdayMaskedTextBox";
       WednesdayMaskedTextBox.Size = new Size(61, 23);
-      WednesdayMaskedTextBox.TabIndex = 12;
+      WednesdayMaskedTextBox.TabIndex = 3;
       WednesdayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // FridayMaskedTextBox
@@ -162,7 +162,7 @@
       FridayMaskedTextBox.Mask = "00:00";
       FridayMaskedTextBox.Name = "FridayMaskedTextBox";
       FridayMaskedTextBox.Size = new Size(62, 23);
-      FridayMaskedTextBox.TabIndex = 11;
+      FridayMaskedTextBox.TabIndex = 5;
       FridayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // ThursdayMaskedTextBox
@@ -175,7 +175,7 @@
       ThursdayMaskedTextBox.Mask = "00:00";
       ThursdayMaskedTextBox.Name = "ThursdayMaskedTextBox";
       ThursdayMaskedTextBox.Size = new Size(61, 23);
-      ThursdayMaskedTextBox.TabIndex = 10;
+      ThursdayMaskedTextBox.TabIndex = 4;
       ThursdayMaskedTextBox.ValidatingType = typeof(DateTime);
       // 
       // MondayTimeLabel
@@ -325,7 +325,7 @@
       MondayPauseUpDown.Minimum = new decimal(new int[] { 45, 0, 0, 0 });
       MondayPauseUpDown.Name = "MondayPauseUpDown";
       MondayPauseUpDown.Size = new Size(61, 23);
-      MondayPauseUpDown.TabIndex = 5;
+      MondayPauseUpDown.TabIndex = 6;
       MondayPauseUpDown.Value = new decimal(new int[] { 60, 0, 0, 0 });
       // 
       // TuesdayPauseUpDown
@@ -338,7 +338,7 @@
       TuesdayPauseUpDown.Minimum = new decimal(new int[] { 45, 0, 0, 0 });
       TuesdayPauseUpDown.Name = "TuesdayPauseUpDown";
       TuesdayPauseUpDown.Size = new Size(61, 23);
-      TuesdayPauseUpDown.TabIndex = 6;
+      TuesdayPauseUpDown.TabIndex = 7;
       TuesdayPauseUpDown.Value = new decimal(new int[] { 60, 0, 0, 0 });
       // 
       // WednesdayPauseUpDown
@@ -351,7 +351,7 @@
       WednesdayPauseUpDown.Minimum = new decimal(new int[] { 45, 0, 0, 0 });
       WednesdayPauseUpDown.Name = "WednesdayPauseUpDown";
       WednesdayPauseUpDown.Size = new Size(61, 23);
-      WednesdayPauseUpDown.TabIndex = 7;
+      WednesdayPauseUpDown.TabIndex = 8;
       WednesdayPauseUpDown.Value = new decimal(new int[] { 60, 0, 0, 0 });
       // 
       // ThursdayPauseUpDown
@@ -364,7 +364,7 @@
       ThursdayPauseUpDown.Minimum = new decimal(new int[] { 45, 0, 0, 0 });
       ThursdayPauseUpDown.Name = "ThursdayPauseUpDown";
       ThursdayPauseUpDown.Size = new Size(61, 23);
-      ThursdayPauseUpDown.TabIndex = 8;
+      ThursdayPauseUpDown.TabIndex = 9;
       ThursdayPauseUpDown.Value = new decimal(new int[] { 60, 0, 0, 0 });
       // 
       // FridayPauseUpDown
@@ -377,7 +377,7 @@
       FridayPauseUpDown.Minimum = new decimal(new int[] { 45, 0, 0, 0 });
       FridayPauseUpDown.Name = "FridayPauseUpDown";
       FridayPauseUpDown.Size = new Size(62, 23);
-      FridayPauseUpDown.TabIndex = 9;
+      FridayPauseUpDown.TabIndex = 10;
       FridayPauseUpDown.Value = new decimal(new int[] { 120, 0, 0, 0 });
       // 
       // PauseSectionLabel
@@ -403,7 +403,7 @@
       AutoReminderCheckBox.Name = "AutoReminderCheckBox";
       AutoReminderCheckBox.Padding = new Padding(0, 15, 0, 0);
       AutoReminderCheckBox.Size = new Size(336, 34);
-      AutoReminderCheckBox.TabIndex = 4;
+      AutoReminderCheckBox.TabIndex = 12;
       AutoReminderCheckBox.Text = "Activer automatiquement les rappels";
       AutoReminderCheckBox.UseVisualStyleBackColor = true;
       AutoReminderCheckBox.Visible = false;
@@ -430,7 +430,7 @@
       CancelFormButton.Location = new Point(176, 0);
       CancelFormButton.Name = "CancelFormButton";
       CancelFormButton.Size = new Size(75, 30);
-      CancelFormButton.TabIndex = 2;
+      CancelFormButton.TabIndex = 15;
       CancelFormButton.Text = "Annuler";
       CancelFormButton.UseVisualStyleBackColor = true;
       // 
@@ -452,7 +452,7 @@
       SaveButton.Location = new Point(261, 0);
       SaveButton.Name = "SaveButton";
       SaveButton.Size = new Size(75, 30);
-      SaveButton.TabIndex = 0;
+      SaveButton.TabIndex = 16;
       SaveButton.Text = "Enregistrer";
       SaveButton.UseVisualStyleBackColor = true;
       SaveButton.Click += SaveButton_Click;
@@ -467,7 +467,7 @@
       AutoStartCheckBox.Name = "AutoStartCheckBox";
       AutoStartCheckBox.Padding = new Padding(0, 15, 0, 0);
       AutoStartCheckBox.Size = new Size(336, 34);
-      AutoStartCheckBox.TabIndex = 7;
+      AutoStartCheckBox.TabIndex = 11;
       AutoStartCheckBox.Text = "Démarrer avec windows";
       AutoStartCheckBox.UseVisualStyleBackColor = true;
       // 
@@ -509,7 +509,7 @@
       GithubLinkLabel.Margin = new Padding(0);
       GithubLinkLabel.Name = "GithubLinkLabel";
       GithubLinkLabel.Size = new Size(168, 25);
-      GithubLinkLabel.TabIndex = 8;
+      GithubLinkLabel.TabIndex = 13;
       GithubLinkLabel.TabStop = true;
       GithubLinkLabel.Text = "GitHub";
       GithubLinkLabel.Click += GithubLinkLabel_Click;
