@@ -496,7 +496,7 @@
       ProductNameLabel.Padding = new Padding(0, 0, 0, 10);
       ProductNameLabel.Size = new Size(168, 25);
       ProductNameLabel.TabIndex = 7;
-      ProductNameLabel.Text = "Time Tracker v0.1";
+      ProductNameLabel.Text = "Time Tracker v0.2";
       ProductNameLabel.TextAlign = ContentAlignment.TopRight;
       // 
       // GithubLinkLabel
