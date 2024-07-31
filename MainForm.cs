@@ -330,15 +330,23 @@ namespace time_tracker
       }
       if (count % 2 == 1)
       {
-        if (IsReminderEnabled && !string.IsNullOrEmpty (Reminder))
+        if (IsReminderEnabled && !string.IsNullOrEmpty(Reminder) && !steps.Contains(Reminder))
           steps.Add(Reminder);
         else if (target > 0)
           steps.Add(DateTime.Now.AddMinutes(target).ToString("HH:mm"));
       }
       else if (lastCheck.Hour >= 12 && lastCheck.Hour < 14 && Pauses[TodayIdx] > 0 && !isHalfDayOff && target > 0)
       {
-        steps.Add(lastCheck.AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
-        steps.Add(DateTime.Now.AddMinutes(target + Pauses[TodayIdx]).ToString("HH:mm"));
+        if (IsReminderEnabled && !string.IsNullOrEmpty(Reminder))
+        {
+          steps.Add(Reminder);
+          steps.Add(DateTime.ParseExact(Reminder, "HH:mm", CultureInfo.InvariantCulture).AddMinutes(target).ToString("HH:mm"));
+        }
+        else
+        {
+          steps.Add(lastCheck.AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
+          steps.Add(DateTime.Now.AddMinutes(target + Pauses[TodayIdx]).ToString("HH:mm"));
+        }
       }
       return steps;
     }
@@ -546,6 +554,8 @@ namespace time_tracker
     {
       if (DayContextMenu >= 0 && DayContextMenu < WeekDays.Count)
       {
+        Reminder = string.Empty;
+        AutoCreateReminder = Properties.Settings.Default.AutoReminder;
         string type = (sender == DayHalfOffToolStripMenuItem) ? "half_day_off" : "day_off";
         if (WeekDays[DayContextMenu].Annotation?.Type == type)
           DataBase.DeleteAnnotation(WeekDays[DayContextMenu].Annotation!);
