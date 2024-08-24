@@ -32,6 +32,7 @@
       CancelFormButton = new Button();
       SaveButton = new Button();
       SpacePanel = new Panel();
+      DebugRichTextBox = new RichTextBox();
       SuspendLayout();
       // 
       // TimeMaskedTextBox
@@ -85,6 +86,19 @@
       SpacePanel.Size = new Size(10, 28);
       SpacePanel.TabIndex = 6;
       // 
+      // DebugRichTextBox
+      // 
+      DebugRichTextBox.BorderStyle = BorderStyle.None;
+      DebugRichTextBox.DetectUrls = false;
+      DebugRichTextBox.Dock = DockStyle.Bottom;
+      DebugRichTextBox.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+      DebugRichTextBox.Location = new Point(10, 38);
+      DebugRichTextBox.Name = "DebugRichTextBox";
+      DebugRichTextBox.Size = new Size(256, 0);
+      DebugRichTextBox.TabIndex = 7;
+      DebugRichTextBox.Text = "";
+      DebugRichTextBox.Visible = false;
+      // 
       // ReminderForm
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
@@ -94,6 +108,7 @@
       Controls.Add(SpacePanel);
       Controls.Add(SaveButton);
       Controls.Add(TimeMaskedTextBox);
+      Controls.Add(DebugRichTextBox);
       FormBorderStyle = FormBorderStyle.FixedSingle;
       MaximizeBox = false;
       MinimizeBox = false;
@@ -113,5 +128,6 @@
     private Button CancelFormButton;
     private MaskedTextBox TimeMaskedTextBox;
     private Panel SpacePanel;
+    private RichTextBox DebugRichTextBox;
   }
 }

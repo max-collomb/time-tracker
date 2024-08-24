@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="xunit\**" />
+    <EmbeddedResource Remove="xunit\**" />
+    <None Remove="xunit\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="resources\shell32_clock.ico" />
   </ItemGroup>
 

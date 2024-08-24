@@ -2,6 +2,7 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.Text;
 
 namespace time_tracker
 {
@@ -269,7 +270,7 @@ namespace time_tracker
       }
       if (Properties.Settings.Default.AutoReminder)
       {
-        List<string> targetSteps = GetTargetSteps();
+        List<string> targetSteps = TimeHelper.GetTargetSteps(WeekDays, TodayIdx, DateTime.Now, Targets, Pauses, IsReminderEnabled, Reminder);
         bool first = true;
         foreach (string step in targetSteps)
         {
@@ -292,7 +293,7 @@ namespace time_tracker
           };
           if (first)
           {
-            stepLabel.DoubleClick += ReminderLabelDoubleClick;
+            stepLabel.MouseDoubleClick += ReminderLabelDoubleClick;
             MainFormToolTip.SetToolTip(stepLabel, "Double-clic pour modifier le rappel");
           }
           CenterFlowLayoutPanel.Controls.Add(stepLabel);
@@ -303,52 +304,6 @@ namespace time_tracker
       CurrentDate = DateTime.Now.DayOfYear;
       SecondTimer_Tick(new object(), new EventArgs());
       ChartPictureBox.Refresh();
-    }
-
-    private List<string> GetTargetSteps()
-    {
-      int count = WeekDays[TodayIdx].Checks.Count;
-      bool isHalfDayOff = WeekDays[TodayIdx].Annotation?.Type == "half_day_off";
-      List<string> steps = new();
-      if (count == 0 || (count > 3 && count % 2 == 0))
-        return steps;
-      if (isHalfDayOff && count == 2)
-        return steps;
-      DateTime lastCheck = DateTime.ParseExact(WeekDays[TodayIdx].Checks[count - 1].Time, "HH:mm", CultureInfo.InvariantCulture);
-      int target = 0;
-      for (int i = 0; i <= TodayIdx; i++)
-      {
-        target += Targets[i] - WeekDays[i].TimeChecked - WeekDays[i].TimeOff;
-      }
-      if (lastCheck.Hour < 12 && Pauses[TodayIdx] > 0 && !isHalfDayOff)
-      {
-        // on ajoute la pause de midi
-        string pauseStart = (IsReminderEnabled && !string.IsNullOrEmpty(Reminder)) ? Reminder : (Pauses[TodayIdx] > 100 ? "12:00" : "12:15");
-        target += Pauses[TodayIdx];
-        steps.Add(pauseStart);
-        steps.Add(DateTime.ParseExact(pauseStart, "HH:mm", CultureInfo.InvariantCulture).AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
-      }
-      if (count % 2 == 1)
-      {
-        if (IsReminderEnabled && !string.IsNullOrEmpty(Reminder) && !steps.Contains(Reminder))
-          steps.Add(Reminder);
-        else if (target > 0)
-          steps.Add(DateTime.Now.AddMinutes(target).ToString("HH:mm"));
-      }
-      else if (lastCheck.Hour >= 12 && lastCheck.Hour < 14 && Pauses[TodayIdx] > 0 && !isHalfDayOff && target > 0)
-      {
-        if (IsReminderEnabled && !string.IsNullOrEmpty(Reminder))
-        {
-          steps.Add(Reminder);
-          steps.Add(DateTime.ParseExact(Reminder, "HH:mm", CultureInfo.InvariantCulture).AddMinutes(target).ToString("HH:mm"));
-        }
-        else
-        {
-          steps.Add(lastCheck.AddMinutes(Pauses[TodayIdx]).ToString("HH:mm"));
-          steps.Add(DateTime.Now.AddMinutes(target + Pauses[TodayIdx]).ToString("HH:mm"));
-        }
-      }
-      return steps;
     }
 
     private void ChartPictureBox_Paint(object sender, PaintEventArgs e)
@@ -490,17 +445,53 @@ namespace time_tracker
       }
     }
 
-    private void ReminderLabelDoubleClick(object? sender, EventArgs e)
+    private void ReminderLabelDoubleClick(object? sender, MouseEventArgs e)
     {
       string? time = (string?)((Label?)sender)?.DataContext;
       if (!string.IsNullOrEmpty(time))
       {
         using ReminderForm reminderForm = new(time);
+        if (e.Button == MouseButtons.Right)
+        {
+          reminderForm.ShowDebug(GenerateXUnitCode());
+        }
         reminderForm.ShowDialog(this);
         Reminder = reminderForm.IsEnabled ? reminderForm.Time : string.Empty;
         IsReminderEnabled = reminderForm.IsEnabled;
         RefreshTimeData();
       }
+    }
+
+    private string GenerateXUnitCode() {
+      StringBuilder sb = new();
+      sb.AppendLine( "[Fact]");
+      sb.AppendLine( "public void TestXX()");
+      sb.AppendLine( "{");
+      sb.AppendLine($"  Day.WeekLoad = {Day.WeekLoad};");
+      sb.AppendLine($"  string currentDay = \"{DateTime.Now.ToString("yyyy-MM-dd")}\";");
+      sb.AppendLine($"  string currentTime = \"{DateTime.Now.ToString("HH:mm")}\";");
+      sb.AppendLine( "  List<string> steps = TimeHelper.GetTargetSteps(");
+      sb.AppendLine( "    [");
+      foreach (var day in WeekDays)
+      {
+        List<string> checks = [];
+        foreach (var check in day.Checks)
+          checks.Add("\"" + check.Time + "\"");
+        string annotation = day.Annotation != null ? day.Annotation.Type : "";
+        sb.AppendLine($"      new(\"{day.SqlDate}\", [{string.Join(',',checks)}], \"{annotation}\", currentDay, currentTime),");
+      }
+      sb.AppendLine( "    ],");
+      sb.AppendLine($"    {TodayIdx}, // Today's week index");
+      sb.AppendLine( "    DateTime.ParseExact(currentTime, \"HH:mm\", CultureInfo.InvariantCulture),");
+      sb.AppendLine($"    [{string.Join(',',Targets)}],");
+      sb.AppendLine($"    [{string.Join(',', Pauses)}],");
+      sb.AppendLine($"    {IsReminderEnabled.ToString().ToLower()}, // rappel activé ?");
+      sb.AppendLine($"    \"{Reminder}\" // heure du prochain rappel");
+      sb.AppendLine( "  );");
+      sb.AppendLine( "  // étapes de rappel attendues");
+      sb.AppendLine($"  Assert.Equal(\"{string.Join('|', TimeHelper.GetTargetSteps(WeekDays, TodayIdx, DateTime.Now, Targets, Pauses, IsReminderEnabled, Reminder))}\", string.Join('|', steps));");
+      sb.AppendLine("}");
+      return sb.ToString();
     }
 
     private void OptionsButton_Click(object sender, EventArgs e)

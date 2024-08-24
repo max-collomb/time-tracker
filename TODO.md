@@ -45,4 +45,5 @@
 [x] Définir des rappels (son + icone clignotante dans barre des tâches)
 [x] Définir des rappels automatiques après chaque badgeage
 [x] Badge sur l'icone de la barre des tâches en cas de notif, possible ? ce serait plus visible que le FlashWindow
+[ ] steps : BUG l'heure de fin de journée disparait après le bip de notif
 [ ] Sauvegarde auto (quotidienne ? hebdo ? mensuelle ?) du fichier SQLite sur U:\

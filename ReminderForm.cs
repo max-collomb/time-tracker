@@ -15,6 +15,14 @@ namespace time_tracker
       IsEnabled = false;
     }
 
+    public void ShowDebug(string debugInfo) {
+      ClientSize = new Size(576, 448);
+      DebugRichTextBox.Visible = true;
+      DebugRichTextBox.Height = 400;
+      DebugRichTextBox.WordWrap = false;
+      DebugRichTextBox.Text = debugInfo;
+    }
+
     private void EventForm_Load(object sender, EventArgs e)
     {
       ActiveControl = TimeMaskedTextBox;
