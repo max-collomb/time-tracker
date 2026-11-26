@@ -4,8 +4,8 @@ namespace time_tracker
 {
   public partial class EventForm : Form
   {
-    public string Date { get; set; }
-    public string Time { get; set; }
+    public string Date;
+    public string Time;
 
     public EventForm(string date, string time, bool dateEnabled)
     {

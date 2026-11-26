@@ -19,8 +19,6 @@ namespace time_tracker
     {
       if (Mutex.WaitOne(TimeSpan.Zero, true))
       {
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
         ApplicationConfiguration.Initialize();
         InitializeLogger();
         Application.Run(new MainForm());

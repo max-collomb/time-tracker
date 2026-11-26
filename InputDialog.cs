@@ -12,6 +12,8 @@
         ClientSize = size,
         Text = "Modifier",
         StartPosition = FormStartPosition.CenterParent,
+        AutoScaleMode = AutoScaleMode.Font,
+        AutoScaleDimensions = new SizeF(7F, 15F),
       };
 
       TextBox textBox = new()

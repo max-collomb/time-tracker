@@ -124,9 +124,16 @@ namespace time_tracker
         return steps;
       DateTime lastCheck = DateTime.ParseExact(weekDays[todayIdx].Checks[count - 1].Time, "HH:mm", CultureInfo.InvariantCulture);
       int target = 0;
-      for (int i = 0; i <= todayIdx; i++)
+      for (int i = 0; i < weekDays.Count; i++)
       {
-        target += targets[i] - weekDays[i].TimeChecked - weekDays[i].TimeOff;
+        if (i <= todayIdx)
+        {
+          target += targets[i] - weekDays[i].TimeChecked - weekDays[i].TimeOff;
+        }
+        else if (weekDays[i].Annotation?.Type == "day_off")
+        {
+          target += targets[i] - weekDays[i].TimeOff;
+        }
       }
       if (lastCheck.Hour < 12 && pauses[todayIdx] > 0 && !isHalfDayOff)
       {
@@ -152,8 +159,12 @@ namespace time_tracker
         }
         else
         {
-          steps.Add(lastCheck.AddMinutes(pauses[todayIdx]).ToString("HH:mm"));
-          steps.Add(now.AddMinutes(target + pauses[todayIdx]).ToString("HH:mm"));
+          DateTime nextCheck = lastCheck.AddMinutes(pauses[todayIdx]);
+          if (nextCheck.Hour >= 14) {
+            nextCheck = DateTime.ParseExact("14:00", "HH:mm", CultureInfo.InvariantCulture);
+          }
+          steps.Add(nextCheck.ToString("HH:mm"));
+          steps.Add(nextCheck.AddMinutes(target + pauses[todayIdx]).ToString("HH:mm"));
         }
       }
       return steps;

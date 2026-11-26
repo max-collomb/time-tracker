@@ -4,9 +4,9 @@ namespace time_tracker
 {
   public partial class AnnotationForm : Form
   {
-    public string Date { get; set; }
-    public bool IsHalfDay { get; set; }
-    public string Description { get; set; }
+    public string Date;
+    public bool IsHalfDay;
+    public string Description;
 
     public AnnotationForm(string date, bool isHalfDay, string description)
     {

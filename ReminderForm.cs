@@ -4,8 +4,8 @@ namespace time_tracker
 {
   public partial class ReminderForm : Form
   {
-    public string Time { get; set; }
-    public bool IsEnabled { get; set; }
+    public string Time;
+    public bool IsEnabled;
 
     public ReminderForm(string time)
     {
@@ -16,9 +16,9 @@ namespace time_tracker
     }
 
     public void ShowDebug(string debugInfo) {
-      ClientSize = new Size(576, 448);
+      ClientSize = new Size(LogicalToDeviceUnits(576), LogicalToDeviceUnits(448));
       DebugRichTextBox.Visible = true;
-      DebugRichTextBox.Height = 400;
+      DebugRichTextBox.Height = LogicalToDeviceUnits(400);
       DebugRichTextBox.WordWrap = false;
       DebugRichTextBox.Text = debugInfo;
     }

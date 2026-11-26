@@ -101,53 +101,79 @@ namespace time_tracker
         {
             Screen currentScreen = Screen.FromPoint(Location);
             Rectangle workingArea = currentScreen.WorkingArea;
+            LtrbRectangle inset = GetInvisibleInsets();
             if ((anchor & SnapLocation.Left) != 0)
             {
-                Left = workingArea.Left + AnchorDistance;
+                Left = workingArea.Left + AnchorDistance - inset.Left;
             }
             else if ((anchor & SnapLocation.Right) != 0)
             {
-                Left = workingArea.Right - AnchorDistance - Width;
+                Left = workingArea.Right - AnchorDistance - Width + inset.Right;
             }
             if ((anchor & SnapLocation.Top) != 0)
             {
-                Top = workingArea.Top + AnchorDistance;
+                Top = workingArea.Top + AnchorDistance - inset.Top;
             }
             else if ((anchor & SnapLocation.Bottom) != 0)
             {
-                Top = workingArea.Bottom - AnchorDistance - Height;
+                Top = workingArea.Bottom - AnchorDistance - Height + inset.Bottom;
             }
             _snapAnchor = anchor;
         }
 
+        private const int DwmwaExtendedFrameBounds = 9;
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attr, out LtrbRectangle value, int size);
+
+        /// <summary>
+        /// Width of the invisible resize border (DWM shadow frame) around the window:
+        /// difference between the window bounds and its visible bounds.
+        /// </summary>
+        private LtrbRectangle GetInvisibleInsets()
+        {
+            if (!IsHandleCreated)
+                return default;
+            if (DwmGetWindowAttribute(Handle, DwmwaExtendedFrameBounds, out LtrbRectangle frame,
+                    Marshal.SizeOf<LtrbRectangle>()) != 0)
+                return default;
+            Rectangle b = Bounds;
+            return new LtrbRectangle(
+                Math.Max(0, frame.Left - b.Left),
+                Math.Max(0, frame.Top - b.Top),
+                Math.Max(0, b.Right - frame.Right),
+                Math.Max(0, b.Bottom - frame.Bottom));
+        }
+
         private bool InSnapRange(int a, int b)
         {
-            return Math.Abs(a - b) < SnapDistance;
+            return Math.Abs(a - b) < LogicalToDeviceUnits(SnapDistance);
         }
 
         private SnapLocation FindSnap(ref Rectangle effectiveBounds)
         {
             Screen currentScreen = Screen.FromPoint(effectiveBounds.Location);
             Rectangle workingArea = currentScreen.WorkingArea;
+            LtrbRectangle inset = GetInvisibleInsets();
             SnapLocation anchor = SnapLocation.None;
-            if (InSnapRange(effectiveBounds.Left, workingArea.Left + AnchorDistance))
+            if (InSnapRange(effectiveBounds.Left + inset.Left, workingArea.Left + AnchorDistance))
             {
-                effectiveBounds.X = workingArea.Left + AnchorDistance;
+                effectiveBounds.X = workingArea.Left + AnchorDistance - inset.Left;
                 anchor |= SnapLocation.Left;
             }
-            else if (InSnapRange(effectiveBounds.Right, workingArea.Right - AnchorDistance))
+            else if (InSnapRange(effectiveBounds.Right - inset.Right, workingArea.Right - AnchorDistance))
             {
-                effectiveBounds.X = workingArea.Right - AnchorDistance - effectiveBounds.Width;
+                effectiveBounds.X = workingArea.Right - AnchorDistance - effectiveBounds.Width + inset.Right;
                 anchor |= SnapLocation.Right;
             }
-            if (InSnapRange(effectiveBounds.Top, workingArea.Top + AnchorDistance))
+            if (InSnapRange(effectiveBounds.Top + inset.Top, workingArea.Top + AnchorDistance))
             {
-                effectiveBounds.Y = workingArea.Top + AnchorDistance;
+                effectiveBounds.Y = workingArea.Top + AnchorDistance - inset.Top;
                 anchor |= SnapLocation.Top;
             }
-            else if (InSnapRange(effectiveBounds.Bottom, workingArea.Bottom - AnchorDistance))
+            else if (InSnapRange(effectiveBounds.Bottom - inset.Bottom, workingArea.Bottom - AnchorDistance))
             {
-                effectiveBounds.Y = workingArea.Bottom - AnchorDistance - effectiveBounds.Height;
+                effectiveBounds.Y = workingArea.Bottom - AnchorDistance - effectiveBounds.Height + inset.Bottom;
                 anchor |= SnapLocation.Bottom;
             }
             return anchor;

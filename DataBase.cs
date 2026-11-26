@@ -240,6 +240,8 @@ namespace time_tracker
         Dictionary<string, DateTime> holidays = Calendar.GetHolidays(DateTime.Now.Year);
         foreach (var kvp in holidays)
         {
+          if (kvp.Value.DayOfWeek == DayOfWeek.Saturday || kvp.Value.DayOfWeek == DayOfWeek.Sunday)
+            continue;
           InsertAnnotation(kvp.Value.ToString("yyyy-MM-dd"), "day_off", kvp.Key);
         }
       }

@@ -8,21 +8,21 @@ namespace time_tracker
 {
   public partial class MainForm : AnchoredForm
   {
-    public List<Day> WeekDays { get; set; }
-    public int TodayIdx { get; set; }
-    public int HoveredDay { get; set; }
-    public List<int> Targets { get; set; }
-    public List<int> Pauses { get; set; }
-    public int WeekLoad { get; set; }
-    public int CurrentDate { get; set; }
-    public string CurrentTime { get; set; }
-    public bool? IsInProgress { get; set; }
-    public HistoryForm? HistoryForm { get; set; }
-    public ThumbnailToolBarButton? ThumbnailButton { get; set; }
-    public int DayContextMenu { get; set; }
-    public bool AutoCreateReminder { get; set; }
-    public bool IsReminderEnabled { get; set; }
-    public string Reminder { get; set; }
+    public List<Day> WeekDays;
+    public int TodayIdx;
+    public int HoveredDay;
+    public List<int> Targets;
+    public List<int> Pauses;
+    public int WeekLoad;
+    public int CurrentDate;
+    public string CurrentTime;
+    public bool? IsInProgress;
+    public HistoryForm? HistoryForm;
+    public ThumbnailToolBarButton? ThumbnailButton;
+    public int DayContextMenu;
+    public bool AutoCreateReminder;
+    public bool IsReminderEnabled;
+    public string Reminder;
     public MainForm()
     {
       WeekDays = [];
@@ -134,6 +134,8 @@ namespace time_tracker
       };
       player.Play();
       DataBase.InsertEvent();
+      Reminder = string.Empty;
+      IsReminderEnabled = false;
       AutoCreateReminder = Properties.Settings.Default.AutoReminder;
       RefreshTimeData();
       if (WeekDays[TodayIdx].Checks.Count == 1) // seulement au premier badgeage du jour
