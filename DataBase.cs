@@ -136,13 +136,13 @@ namespace time_tracker
         var command = sqliteConnection.CreateCommand();
         string today = date.Date.ToString("yyyy-MM-dd");
         string lastMonth = date.AddMonths(-1).Date.ToString("yyyy-MM-dd");
-        command.CommandText = @"SELECT COUNT(rowid), GROUP_CONCAT(TIME, "" | ""), date
+        command.CommandText = @"SELECT COUNT(rowid), GROUP_CONCAT(time, ' | '), date
           FROM events
-          WHERE TYPE = @type
+          WHERE type = @type
             AND date = (
               SELECT MAX(date)
               FROM events
-              WHERE DATE < @today
+              WHERE date < @today
                 AND date > @lastmonth
             )";
         command.Parameters.AddWithValue("@type", "usr_check");
